@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     alerts,
     summaries,
     certificates,
+    public_verification,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -26,3 +27,4 @@ api_router.include_router(progress.router, prefix="/progress", tags=["Verified P
 api_router.include_router(alerts.router, prefix="/alerts", tags=["Pace Alerts"])
 api_router.include_router(summaries.router, prefix="/summaries", tags=["Practice Summaries"])
 api_router.include_router(certificates.router, prefix="/certificates", tags=["Certificates"])
+api_router.include_router(public_verification.router, prefix="/public", tags=["Public Verification"])

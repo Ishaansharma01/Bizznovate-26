@@ -535,3 +535,57 @@ export async function downloadCertificatePdf(
     return { success: false, error: err.message || 'Download network error' };
   }
 }
+
+
+// Public Alumni Certificate Verification Interfaces
+export interface PublicCertificateData {
+  is_verified: boolean;
+  certificate_id: string;
+  status: 'issued' | 'revoked' | 'superseded';
+  student_name: string;
+  program_name: string;
+  program_code: string;
+  completion_date: string;
+  issue_date: string;
+  total_approved_hours: number;
+  category_hours: Record<string, number>;
+  signature_digest: string;
+  revocation_reason?: string | null;
+  revoked_at?: string | null;
+  superseded_by?: string | null;
+  signatory_title: string;
+  has_pdf: boolean;
+}
+
+export async function verifyCertificatePublicApi(
+  certificateId: string
+): Promise<ApiResponse<PublicCertificateData>> {
+  const cleanId = encodeURIComponent(certificateId.trim());
+  const response = await fetch(`${API_BASE}/public/certificates/${cleanId}`);
+  return response.json();
+}
+
+export async function downloadPublicCertificatePdf(
+  certificateId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const cleanId = encodeURIComponent(certificateId.trim());
+    const response = await fetch(`${API_BASE}/public/certificates/${cleanId}/download`);
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => null);
+      return { success: false, error: errJson?.error?.message || errJson?.detail || 'Download failed' };
+    }
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `ShailjaYoga_Verified_${certificateId.trim()}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Download network error' };
+  }
+}
