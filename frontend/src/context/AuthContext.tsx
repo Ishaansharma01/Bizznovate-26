@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, loginApi, getMeApi } from '../services/api';
+import { User, loginApi, signupStudentApi, getMeApi } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<boolean>;
+  signup: (fullName: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   clearError: () => void;
 }
@@ -65,6 +66,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signup = async (fullName: string, email: string, password: string): Promise<boolean> => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await signupStudentApi(fullName, email, password);
+      if (res.success && res.data) {
+        localStorage.setItem('shailja_yoga_token', res.data.access_token);
+        setToken(res.data.access_token);
+        setUser(res.data.user);
+        return true;
+      } else {
+        setError(res.error?.message || res.message || 'Sign up failed. Please try again.');
+        return false;
+      }
+    } catch (err: any) {
+      setError(err.message || 'Network error attempting to sign up.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('shailja_yoga_token');
     setToken(null);
@@ -75,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, logout, clearError }}>
+    <AuthContext.Provider value={{ user, token, loading, error, login, signup, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );

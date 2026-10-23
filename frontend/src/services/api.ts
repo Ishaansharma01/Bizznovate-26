@@ -197,6 +197,24 @@ export async function loginApi(email: string, password: string): Promise<ApiResp
   return response.json();
 }
 
+export async function signupStudentApi(
+  fullName: string,
+  email: string,
+  password: string
+): Promise<ApiResponse<TokenResponse>> {
+  const response = await fetch(`${API_BASE}/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      full_name: fullName,
+      email: email,
+      password: password,
+      role: 'student',
+    }),
+  });
+  return response.json();
+}
+
 export async function getMeApi(): Promise<ApiResponse<User>> {
   const response = await fetch(`${API_BASE}/auth/me`, {
     headers: getAuthHeaders(),

@@ -110,3 +110,56 @@ def test_tampered_token(client):
     )
     assert response.status_code == 401
     assert response.json()["success"] is False
+
+
+def test_signup_new_student_success(client, db_session):
+    from app.models.models import Program, Enrollment
+    # Ensure active program exists
+    prog = db_session.query(Program).filter(Program.is_active == True).first()
+    if not prog:
+        prog = Program(
+            code="TTC-TEST-200",
+            name="Test 200h Program",
+            required_hours=200,
+            daily_max_hours=8,
+            backdating_window_hours=48,
+            timezone="Asia/Kolkata",
+            is_active=True,
+        )
+        db_session.add(prog)
+        db_session.commit()
+
+    res = client.post(
+        "/api/v1/auth/signup",
+        json={
+            "full_name": "Priya Sharma",
+            "email": "priya.new@shailjayoga.com",
+            "password": "Password123!",
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert "access_token" in data["data"]
+    assert data["data"]["user"]["email"] == "priya.new@shailjayoga.com"
+    assert data["data"]["user"]["role"] == "student"
+
+    # Verify auto-enrollment
+    enrollment = db_session.query(Enrollment).filter(
+        Enrollment.student_id == data["data"]["user"]["id"]
+    ).first()
+    assert enrollment is not None
+    assert enrollment.status == "active"
+
+
+def test_signup_duplicate_email_rejected(client, test_users):
+    res = client.post(
+        "/api/v1/auth/signup",
+        json={
+            "full_name": "Duplicate Student",
+            "email": "student_test@shailjayoga.com",
+            "password": "Password123!",
+        },
+    )
+    assert res.status_code == 400
+    assert res.json()["success"] is False
