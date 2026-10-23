@@ -1,28 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import { Enrollment, getMyEnrollmentsApi } from '../services/api';
+import { Enrollment, getMyEnrollmentsApi, ProgressData, getMyProgressApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { VerifiedProgressCard } from './VerifiedProgressCard';
 import { TrainingLogForm } from './TrainingLogForm';
 import { TrainingLogList } from './TrainingLogList';
 
 export const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [progress, setProgress] = useState<ProgressData | null>(null);
+  const [progressLoading, setProgressLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  const loadEnrollmentsAndProgress = async () => {
+    try {
+      const [enrollRes, progRes] = await Promise.all([
+        getMyEnrollmentsApi(),
+        getMyProgressApi(),
+      ]);
+
+      if (enrollRes.success && enrollRes.data) {
+        setEnrollments(enrollRes.data);
+      } else {
+        setError(enrollRes.error?.message || 'Failed to load enrollment.');
+      }
+
+      if (progRes.success && progRes.data) {
+        setProgress(progRes.data);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setProgressLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getMyEnrollmentsApi()
-      .then((res) => {
-        if (res.success && res.data) {
-          setEnrollments(res.data);
-        } else {
-          setError(res.error?.message || 'Failed to load enrollment.');
-        }
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+    loadEnrollmentsAndProgress();
+  }, [refreshTrigger]);
 
   const handleLogSubmitted = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -42,10 +60,13 @@ export const StudentDashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Enrollment Card */}
+      {/* Authoritative Verified Progress Card */}
+      <VerifiedProgressCard progress={progress} loading={progressLoading} />
+
+      {/* Active Enrollment Info Card */}
       <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.05rem', color: '#1c1917', fontWeight: 600 }}>
-          Active Program Enrollment
+          Batch & Enrollment Information
         </h3>
 
         {loading ? (
@@ -82,7 +103,7 @@ export const StudentDashboard: React.FC = () => {
         />
       )}
 
-      {/* Training Log List */}
+      {/* Training Log History */}
       <TrainingLogList refreshTrigger={refreshTrigger} />
     </div>
   );

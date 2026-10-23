@@ -78,6 +78,27 @@ export interface TrainingLog {
   reviewed_at?: string | null;
 }
 
+export interface ProgressData {
+  enrollment_id: string;
+  student_id: string;
+  student_name: string;
+  program_id: string;
+  program_code: string;
+  program_name: string;
+  required_hours: number;
+  approved_hours: number;
+  pending_hours: number;
+  rejected_hours: number;
+  remaining_hours: number;
+  completion_percentage: number;
+  is_hours_requirement_met: boolean;
+  final_faculty_signoff: boolean;
+  category_totals: Record<string, number>;
+  category_quotas_configured: boolean;
+  category_eligibility_status: string;
+  category_quota_details: Record<string, { required_hours: number | null; completed_hours: number; is_met: boolean }>;
+}
+
 export interface DailyCapacity {
   practice_date: string;
   existing_minutes: number;
@@ -217,5 +238,57 @@ export async function getDailyCapacityApi(
     `${API_BASE}/logs/daily-capacity?enrollment_id=${enrollmentId}&practice_date=${practiceDate}`,
     { headers: getAuthHeaders() }
   );
+  return response.json();
+}
+
+// Faculty Review & Progress APIs
+export async function getReviewQueueApi(
+  statusFilter: string = 'pending',
+  programId?: string,
+  categoryFilter?: string
+): Promise<ApiResponse<TrainingLog[]>> {
+  const params = new URLSearchParams();
+  params.append('status', statusFilter);
+  if (programId) params.append('program_id', programId);
+  if (categoryFilter && categoryFilter !== 'all') params.append('category', categoryFilter);
+
+  const response = await fetch(`${API_BASE}/faculty/reviews?${params.toString()}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function reviewLogApi(
+  logId: string,
+  decision: 'approve' | 'reject' | 'request_correction',
+  feedbackReason?: string
+): Promise<ApiResponse<TrainingLog>> {
+  const response = await fetch(`${API_BASE}/faculty/logs/${logId}/review`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ decision, feedback_reason: feedbackReason }),
+  });
+  return response.json();
+}
+
+export async function getMyProgressApi(): Promise<ApiResponse<ProgressData>> {
+  const response = await fetch(`${API_BASE}/progress/me`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function getEnrollmentProgressApi(enrollmentId: string): Promise<ApiResponse<ProgressData>> {
+  const response = await fetch(`${API_BASE}/progress/enrollment/${enrollmentId}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function facultySignoffApi(enrollmentId: string): Promise<ApiResponse<any>> {
+  const response = await fetch(`${API_BASE}/faculty/enrollments/${enrollmentId}/signoff`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
   return response.json();
 }
