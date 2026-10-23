@@ -33,6 +33,7 @@ class Settings(BaseSettings):
 
     # Certificate & Storage Configuration
     CERTIFICATE_STORAGE_DIR: str = "storage/certificates"
+    CERTIFICATE_SIGNING_KEY: str = "dev-secret-certificate-signing-hmac-key-2026"
     CERTIFICATE_SIGNING_KEY_PATH: str = "keys/certificate_signing_private.pem"
     CERTIFICATE_SIGNING_PASSPHRASE: str = "dev-passphrase"
     PUBLIC_VERIFIER_URL: str = "http://localhost:5173/verify"

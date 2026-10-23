@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { FacultyReviewQueue } from './FacultyReviewQueue';
 import { VerifiedProgressCard } from './VerifiedProgressCard';
 import { PaceMonitorCard } from './PaceMonitorCard';
+import { CertificateEligibilityCard } from './CertificateEligibilityCard';
 
 export const FacultyDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -187,6 +188,14 @@ export const FacultyDashboard: React.FC = () => {
             </div>
 
             <PaceMonitorCard pace={inspectedPace} loading={inspectLoading} />
+
+            {/* Certification Eligibility and Issuance Card */}
+            <div style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
+              <CertificateEligibilityCard
+                enrollmentId={selectedEnrollmentId}
+                onCertificateIssued={() => handleInspectStudent(selectedEnrollmentId)}
+              />
+            </div>
 
             {inspectedProgress && (
               <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fafaf9', border: '1px solid #e7e5e4', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>

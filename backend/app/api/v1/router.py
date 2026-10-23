@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     progress,
     alerts,
     summaries,
+    certificates,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -24,3 +25,4 @@ api_router.include_router(faculty.router, prefix="/faculty", tags=["Faculty Revi
 api_router.include_router(progress.router, prefix="/progress", tags=["Verified Progress"])
 api_router.include_router(alerts.router, prefix="/alerts", tags=["Pace Alerts"])
 api_router.include_router(summaries.router, prefix="/summaries", tags=["Practice Summaries"])
+api_router.include_router(certificates.router, prefix="/certificates", tags=["Certificates"])

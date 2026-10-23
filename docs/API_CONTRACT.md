@@ -154,11 +154,27 @@
 ### 3.9 Journal Summarization (`/api/v1/logs/{log_id}/summary`)
 - **`GET /api/v1/logs/{log_id}/summary`** *(Faculty/Admin)*: Returns structured AI summary (`key_learning`, `practice_reflection`, `topics_for_review`). Does not alter verified hours or status.
 
-### 3.10 Certificates & Lifecycle (`/api/v1/certificates`)
-- **`GET /api/v1/certificates/eligibility/{enrollment_id}`** *(Faculty/Admin/Student)*: Checks server-side eligibility: 200 approved hours, category quota satisfaction, final faculty sign-off.
-- **`POST /api/v1/certificates/issue`** *(Issuer/Admin)*: Idempotently creates certificate, generates PDF artifact, and creates public snapshot.
-- **`POST /api/v1/certificates/{certificate_id}/revoke`** *(Admin)*: Revokes certificate with required audit reason.
-- **`GET /api/v1/certificates/{certificate_id}/download`**: Authorized download of generated PDF.
+### 3.10 Certificates & Lifecycle (/api/v1/certificates)
+- **GET /api/v1/certificates/eligibility/{enrollment_id}** *(Student [self] / Faculty / Admin / Issuer)*:
+  - Authoritative evaluation of all 6 non-negotiable graduation certification criteria:
+    1. Minimum 200 approved hours (or configured program requirement).
+    2. Satisfied category distribution quotas (blocks with CONFIGURATION_REQUIRED if unconfigured).
+    3. Zero unresolved logs (no pending or correction_requested submissions).
+    4. Mandatory faculty final sign-off completed.
+    5. Active student account and active program standing.
+    6. No existing active certificate (prevents duplicate generation).
+- **POST /api/v1/certificates/issue** *(Certificate Issuer / Admin)*:
+  - Idempotently creates certificate, computes HMAC-SHA256 tamper-evident digest, renders high-resolution landscape PDF with QR code, inserts immutable public snapshot, marks enrollment as graduated, and logs an audit event.
+- **GET /api/v1/certificates/{certificate_id}** *(Student [self] / Faculty / Admin / Issuer)*:
+  - Retrieve detailed certificate record and status. Cross-student access blocked with HTTP 403.
+- **GET /api/v1/certificates/{certificate_id}/download** *(Student [self] / Faculty / Admin / Issuer)*:
+  - Streams official certificate PDF file. Private server filesystem paths are never leaked to client.
+- **POST /api/v1/certificates/{certificate_id}/revoke** *(Certificate Issuer / Admin)*:
+  - Revokes active certificate with mandatory reason tracking (min 5 chars). Updates snapshot and preserves historical audit records.
+- **POST /api/v1/certificates/{certificate_id}/supersede** *(Certificate Issuer / Admin)*:
+  - Retires prior certificate (SUPERSEDED status) and generates a corrected replacement certificate (ISSUED status) linked to the original.
+- **GET /api/v1/certificates/enrollment/{enrollment_id}** *(Student [self] / Faculty / Admin / Issuer)*:
+  - List all active, revoked, and superseded certificates for an enrollment.
 
 ### 3.11 Public Verification (`/api/v1/public/certificates/{certificate_id}`)
 - **`GET /api/v1/public/certificates/{certificate_id}`**

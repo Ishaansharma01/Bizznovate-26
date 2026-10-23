@@ -5,6 +5,7 @@ import { VerifiedProgressCard } from './VerifiedProgressCard';
 import { PaceMonitorCard } from './PaceMonitorCard';
 import { TrainingLogForm } from './TrainingLogForm';
 import { TrainingLogList } from './TrainingLogList';
+import { CertificateEligibilityCard } from './CertificateEligibilityCard';
 
 export const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -74,6 +75,16 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Progress Pace Monitor Card */}
       <PaceMonitorCard pace={pace} loading={paceLoading} onRefresh={() => setRefreshTrigger((p) => p + 1)} />
+
+      {/* Graduation Certificate & Eligibility Status */}
+      {activeEnrollment && (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <CertificateEligibilityCard
+            enrollmentId={activeEnrollment.id}
+            onCertificateIssued={() => setRefreshTrigger((p) => p + 1)}
+          />
+        </div>
+      )}
 
       {/* Active Enrollment Info Card */}
       <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>

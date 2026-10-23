@@ -388,3 +388,150 @@ export async function generateLogSummaryApi(
   });
   return response.json();
 }
+
+
+// Certificate & Graduation Interfaces
+export interface EligibilityCriteria {
+  hours_completed: number;
+  hours_required: number;
+  hours_satisfied: boolean;
+  category_quotas_satisfied: boolean;
+  category_eligibility_status: string;
+  category_breakdown: Record<string, any>;
+  pending_logs_count: number;
+  has_unresolved_logs: boolean;
+  faculty_signoff_completed: boolean;
+  student_is_active: boolean;
+  has_active_certificate: boolean;
+}
+
+export interface CertificateEligibility {
+  enrollment_id: string;
+  student_id: string;
+  student_name: string;
+  program_id: string;
+  program_name: string;
+  is_eligible: boolean;
+  reasons: string[];
+  criteria: EligibilityCriteria;
+  existing_certificate_id?: string | null;
+}
+
+export interface CertificateRecord {
+  id: string;
+  certificate_id: string;
+  enrollment_id: string;
+  student_id: string;
+  student_name: string;
+  program_id: string;
+  program_name: string;
+  completion_date: string;
+  issue_date: string;
+  status: 'issued' | 'revoked' | 'superseded';
+  total_approved_hours: number;
+  category_hours: Record<string, number>;
+  signature_digest: string;
+  revocation_reason?: string | null;
+  revoked_at?: string | null;
+  superseded_by_id?: string | null;
+  verification_url: string;
+  has_pdf: boolean;
+}
+
+// Certificate APIs
+export async function getCertificateEligibilityApi(
+  enrollmentId: string
+): Promise<ApiResponse<CertificateEligibility>> {
+  const response = await fetch(`${API_BASE}/certificates/eligibility/${enrollmentId}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function issueCertificateApi(
+  enrollmentId: string,
+  idempotencyKey?: string
+): Promise<ApiResponse<CertificateRecord>> {
+  const response = await fetch(`${API_BASE}/certificates/issue`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      enrollment_id: enrollmentId,
+      idempotency_key: idempotencyKey,
+    }),
+  });
+  return response.json();
+}
+
+export async function getCertificateDetailApi(
+  certificateId: string
+): Promise<ApiResponse<CertificateRecord>> {
+  const response = await fetch(`${API_BASE}/certificates/${certificateId}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function getEnrollmentCertificatesApi(
+  enrollmentId: string
+): Promise<ApiResponse<CertificateRecord[]>> {
+  const response = await fetch(`${API_BASE}/certificates/enrollment/${enrollmentId}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function revokeCertificateApi(
+  certificateId: string,
+  revocationReason: string
+): Promise<ApiResponse<CertificateRecord>> {
+  const response = await fetch(`${API_BASE}/certificates/${certificateId}/revoke`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ revocation_reason: revocationReason }),
+  });
+  return response.json();
+}
+
+export async function supersedeCertificateApi(
+  certificateId: string,
+  reason: string
+): Promise<ApiResponse<CertificateRecord>> {
+  const response = await fetch(`${API_BASE}/certificates/${certificateId}/supersede`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ reason }),
+  });
+  return response.json();
+}
+
+export async function downloadCertificatePdf(
+  certificateId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const token = localStorage.getItem('shailja_yoga_token');
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${API_BASE}/certificates/${certificateId}/download`, {
+      headers,
+    });
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => null);
+      return { success: false, error: errJson?.error?.message || errJson?.detail || 'Download failed' };
+    }
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `ShailjaYoga_Certificate_${certificateId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Download network error' };
+  }
+}

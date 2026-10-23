@@ -41,6 +41,10 @@ dist-ssr/
 backend/storage/certificates/*.pdf
 backend/storage/certificates/*
 !backend/storage/certificates/.gitkeep
+storage/certificates/*.pdf
+storage/certificates/*
+!storage/certificates/.gitkeep
+storage/
 
 # IDE & OS
 .vscode/
