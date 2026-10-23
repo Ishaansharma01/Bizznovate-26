@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Enrollment, getAllEnrollmentsApi, ProgressData, getEnrollmentProgressApi, facultySignoffApi } from '../services/api';
+import {
+  Enrollment,
+  getAllEnrollmentsApi,
+  ProgressData,
+  getEnrollmentProgressApi,
+  facultySignoffApi,
+  PaceMetrics,
+  getEnrollmentPaceApi,
+  evaluatePaceApi,
+} from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { FacultyReviewQueue } from './FacultyReviewQueue';
 import { VerifiedProgressCard } from './VerifiedProgressCard';
+import { PaceMonitorCard } from './PaceMonitorCard';
 
 export const FacultyDashboard: React.FC = () => {
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Selected student progress inspection
+  // Selected student progress & pace inspection
   const [selectedEnrollmentId, setSelectedEnrollmentId] = useState<string | null>(null);
   const [inspectedProgress, setInspectedProgress] = useState<ProgressData | null>(null);
+  const [inspectedPace, setInspectedPace] = useState<PaceMetrics | null>(null);
   const [inspectLoading, setInspectLoading] = useState(false);
+  const [evalLoading, setEvalLoading] = useState(false);
   const [signoffMsg, setSignoffMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchEnrollments = async () => {
@@ -35,12 +47,38 @@ export const FacultyDashboard: React.FC = () => {
     setInspectLoading(true);
     setSignoffMsg(null);
     try {
-      const res = await getEnrollmentProgressApi(enrollmentId);
-      if (res.success && res.data) {
-        setInspectedProgress(res.data);
+      const [progRes, paceRes] = await Promise.all([
+        getEnrollmentProgressApi(enrollmentId),
+        getEnrollmentPaceApi(enrollmentId),
+      ]);
+      if (progRes.success && progRes.data) {
+        setInspectedProgress(progRes.data);
+      }
+      if (paceRes.success && paceRes.data) {
+        setInspectedPace(paceRes.data);
       }
     } finally {
       setInspectLoading(false);
+    }
+  };
+
+  const handleTriggerPaceEvaluation = async () => {
+    if (!selectedEnrollmentId) return;
+    setEvalLoading(true);
+    setSignoffMsg(null);
+    try {
+      const res = await evaluatePaceApi(selectedEnrollmentId);
+      if (res.success && res.data) {
+        setInspectedPace(res.data);
+        const alertText = res.data.alert_created
+          ? 'Pace evaluated: New shortfall warning alert created and dispatched to trainee!'
+          : 'Pace evaluated: Trainee is either on track or an active alert already exists.';
+        setSignoffMsg({ type: 'success', text: alertText });
+      } else {
+        setSignoffMsg({ type: 'error', text: res.error?.message || 'Failed to evaluate pace.' });
+      }
+    } finally {
+      setEvalLoading(false);
     }
   };
 
@@ -49,7 +87,7 @@ export const FacultyDashboard: React.FC = () => {
     setSignoffMsg(null);
     const res = await facultySignoffApi(selectedEnrollmentId);
     if (res.success) {
-      setSignoffMsg({ type: 'success', text: 'Final faculty sign-off successfully recorded!' });
+      setSignoffMsg({ type: 'success', text: 'Final faculty sign-off successfully recorded in audit log!' });
       handleInspectStudent(selectedEnrollmentId);
       fetchEnrollments();
     } else {
@@ -65,17 +103,17 @@ export const FacultyDashboard: React.FC = () => {
           Namaste, {user?.full_name}!
         </h2>
         <p style={{ margin: 0, color: '#2563eb', fontSize: '0.9rem' }}>
-          Role: <span style={{ fontWeight: 600 }}>Faculty Reviewer</span> · Authoritative log review, verification, and final completion sign-off
+          Role: <span style={{ fontWeight: 600 }}>Faculty Reviewer</span> · Authoritative log review, progress verification & pace shortfall monitoring
         </p>
       </div>
 
       {/* Review Queue Component */}
       <FacultyReviewQueue />
 
-      {/* Student Progress Inspection & Sign-Off */}
+      {/* Student Progress & Pace Inspection */}
       <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
         <h3 style={{ margin: '0 0 1rem', fontSize: '1.15rem', color: '#1c1917', fontWeight: 700 }}>
-          🎓 Trainee Verified Progress Inspection
+          🎓 Trainee Verified Progress & Schedule Pace Inspection
         </h3>
 
         {loading ? (
@@ -85,7 +123,7 @@ export const FacultyDashboard: React.FC = () => {
         ) : (
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>
-              Select a Trainee to Inspect Verified Progress & Sign-Off:
+              Select a Trainee to Inspect Verified Progress, Pace & Sign-Off:
             </label>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {enrollments.map((e) => (
@@ -110,7 +148,7 @@ export const FacultyDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Display inspected student progress */}
+        {/* Display inspected student progress & pace */}
         {selectedEnrollmentId && (
           <div>
             {signoffMsg && (
@@ -128,6 +166,27 @@ export const FacultyDashboard: React.FC = () => {
             )}
 
             <VerifiedProgressCard progress={inspectedProgress} loading={inspectLoading} />
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+              <button
+                onClick={handleTriggerPaceEvaluation}
+                disabled={evalLoading}
+                style={{
+                  backgroundColor: '#7c3aed',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '6px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: evalLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {evalLoading ? 'Evaluating Pace...' : '⚡ Trigger Trainee Pace Check & Alert'}
+              </button>
+            </div>
+
+            <PaceMonitorCard pace={inspectedPace} loading={inspectLoading} />
 
             {inspectedProgress && (
               <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fafaf9', border: '1px solid #e7e5e4', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>

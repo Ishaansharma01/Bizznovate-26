@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Enrollment, getMyEnrollmentsApi, ProgressData, getMyProgressApi } from '../services/api';
+import { Enrollment, getMyEnrollmentsApi, ProgressData, getMyProgressApi, PaceMetrics, getMyPaceApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { VerifiedProgressCard } from './VerifiedProgressCard';
+import { PaceMonitorCard } from './PaceMonitorCard';
 import { TrainingLogForm } from './TrainingLogForm';
 import { TrainingLogList } from './TrainingLogList';
 
@@ -9,16 +10,19 @@ export const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [progress, setProgress] = useState<ProgressData | null>(null);
+  const [pace, setPace] = useState<PaceMetrics | null>(null);
   const [progressLoading, setProgressLoading] = useState(true);
+  const [paceLoading, setPaceLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const loadEnrollmentsAndProgress = async () => {
+  const loadData = async () => {
     try {
-      const [enrollRes, progRes] = await Promise.all([
+      const [enrollRes, progRes, paceRes] = await Promise.all([
         getMyEnrollmentsApi(),
         getMyProgressApi(),
+        getMyPaceApi(),
       ]);
 
       if (enrollRes.success && enrollRes.data) {
@@ -30,16 +34,21 @@ export const StudentDashboard: React.FC = () => {
       if (progRes.success && progRes.data) {
         setProgress(progRes.data);
       }
+
+      if (paceRes.success && paceRes.data) {
+        setPace(paceRes.data);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
       setProgressLoading(false);
+      setPaceLoading(false);
     }
   };
 
   useEffect(() => {
-    loadEnrollmentsAndProgress();
+    loadData();
   }, [refreshTrigger]);
 
   const handleLogSubmitted = () => {
@@ -62,6 +71,9 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Authoritative Verified Progress Card */}
       <VerifiedProgressCard progress={progress} loading={progressLoading} />
+
+      {/* Progress Pace Monitor Card */}
+      <PaceMonitorCard pace={pace} loading={paceLoading} onRefresh={() => setRefreshTrigger((p) => p + 1)} />
 
       {/* Active Enrollment Info Card */}
       <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>

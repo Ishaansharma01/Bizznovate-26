@@ -99,6 +99,46 @@ export interface ProgressData {
   category_quota_details: Record<string, { required_hours: number | null; completed_hours: number; is_met: boolean }>;
 }
 
+export interface PaceAlert {
+  id: string;
+  enrollment_id: string;
+  shortfall_hours: number;
+  recommended_weekly_pace: number;
+  status: string;
+  is_resolved: boolean;
+  notification_sent: boolean;
+  created_at: string;
+}
+
+export interface PaceMetrics {
+  enrollment_id: string;
+  student_id: string;
+  student_name: string;
+  student_email: string;
+  program_id: string;
+  program_name: string;
+  required_hours: number;
+  approved_hours: number;
+  pending_hours: number;
+  remaining_hours: number;
+  start_date: string;
+  target_graduation_date: string;
+  days_elapsed: number;
+  days_remaining: number;
+  expected_progress_hours: number;
+  shortfall_hours: number;
+  shortfall_warning_threshold: number;
+  required_weekly_pace: number | null;
+  realistic_daily_catchup_pace: number | null;
+  daily_cap_hours: number;
+  is_feasible: boolean;
+  pace_status: 'on_track' | 'behind' | 'critical_shortfall' | 'overdue' | 'completed';
+  status_message: string;
+  alert_created?: boolean;
+  alert_id?: string | null;
+  active_alerts?: PaceAlert[];
+}
+
 export interface DailyCapacity {
   practice_date: string;
   existing_minutes: number;
@@ -287,6 +327,29 @@ export async function getEnrollmentProgressApi(enrollmentId: string): Promise<Ap
 
 export async function facultySignoffApi(enrollmentId: string): Promise<ApiResponse<any>> {
   const response = await fetch(`${API_BASE}/faculty/enrollments/${enrollmentId}/signoff`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+// Pace Monitor APIs
+export async function getMyPaceApi(): Promise<ApiResponse<PaceMetrics>> {
+  const response = await fetch(`${API_BASE}/alerts/me`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function getEnrollmentPaceApi(enrollmentId: string): Promise<ApiResponse<PaceMetrics>> {
+  const response = await fetch(`${API_BASE}/alerts/enrollment/${enrollmentId}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function evaluatePaceApi(enrollmentId: string): Promise<ApiResponse<PaceMetrics>> {
+  const response = await fetch(`${API_BASE}/alerts/evaluate/${enrollmentId}`, {
     method: 'POST',
     headers: getAuthHeaders(),
   });
