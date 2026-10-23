@@ -102,7 +102,17 @@ class ExternalSummarizer(BaseSummarizer):
             return self.mock.summarize(journal_text)
 
 
+_custom_summarizer: Optional[BaseSummarizer] = None
+
+
+def set_summarizer(summarizer: Optional[BaseSummarizer]) -> None:
+    global _custom_summarizer
+    _custom_summarizer = summarizer
+
+
 def get_summarizer() -> BaseSummarizer:
+    if _custom_summarizer is not None:
+        return _custom_summarizer
     provider = settings.NLP_SERVICE_PROVIDER.lower()
     if provider in ("gemini", "openai"):
         return ExternalSummarizer(provider)
@@ -138,8 +148,13 @@ def generate_log_summary(
 
     # Generate fresh summary using configured summarizer
     summarizer = get_summarizer()
-    sections = summarizer.summarize(log.reflection_journal)
-    provider_name = settings.NLP_SERVICE_PROVIDER
+    try:
+        sections = summarizer.summarize(log.reflection_journal)
+        provider_name = settings.NLP_SERVICE_PROVIDER
+    except Exception:
+        fallback = MockSummarizer()
+        sections = fallback.summarize(log.reflection_journal)
+        provider_name = 'fallback'
 
     now = datetime.datetime.now(datetime.timezone.utc)
 
