@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TrainingLog, getReviewQueueApi, reviewLogApi } from '../services/api';
+import { JournalSummaryCard } from './JournalSummaryCard';
 
 export const FacultyReviewQueue: React.FC = () => {
   const [logs, setLogs] = useState<TrainingLog[]>([]);
@@ -80,7 +81,7 @@ export const FacultyReviewQueue: React.FC = () => {
             ⚖️ Faculty Review Queue
           </h3>
           <span style={{ fontSize: '0.85rem', color: '#78716c' }}>
-            Authoritative Review & Decision Engine · Mandatory Justifications
+            Authoritative Review & Decision Engine · AI Grounded Briefs · Mandatory Feedback
           </span>
         </div>
 
@@ -213,20 +214,24 @@ export const FacultyReviewQueue: React.FC = () => {
               </div>
 
               {/* Reflection Journal */}
-              <div style={{ fontSize: '0.9rem', color: '#334155', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '6px', borderLeft: '4px solid #0284c7', marginBottom: '0.75rem', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '0.9rem', color: '#334155', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '6px', borderLeft: '4px solid #0284c7', marginBottom: '0.5rem', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.25rem', fontSize: '0.78rem' }}>Original Student Reflection:</span>
                 {log.reflection_journal}
               </div>
 
+              {/* AI Practice Brief Component */}
+              <JournalSummaryCard logId={log.id} />
+
               {/* Feedback reason if previously reviewed */}
               {log.review_feedback && (
-                <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '0.5rem 0.75rem', borderRadius: '4px', fontSize: '0.82rem', color: '#92400e', marginBottom: '0.75rem' }}>
+                <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '0.5rem 0.75rem', borderRadius: '4px', fontSize: '0.82rem', color: '#92400e', marginTop: '0.75rem' }}>
                   <strong>Prior Feedback ({log.reviewed_by}):</strong> {log.review_feedback}
                 </div>
               )}
 
               {/* Decision Action Buttons (only shown if log is actionable) */}
               {(log.status === 'pending' || log.status === 'correction_requested') && (
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                   <button
                     onClick={() => handleOpenAction(log.id, 'approve')}
                     style={{ backgroundColor: '#16a34a', color: '#fff', border: 'none', padding: '0.45rem 0.85rem', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}

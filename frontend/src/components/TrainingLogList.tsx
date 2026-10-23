@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TrainingLog, getMyLogsApi } from '../services/api';
+import { JournalSummaryCard } from './JournalSummaryCard';
 
 interface TrainingLogListProps {
   refreshTrigger: number;
@@ -187,6 +188,9 @@ export const TrainingLogList: React.FC<TrainingLogListProps> = ({ refreshTrigger
                 <div style={{ fontSize: '0.88rem', color: '#57534e', lineHeight: 1.5, backgroundColor: '#fafaf9', padding: '0.65rem 0.85rem', borderRadius: '4px', borderLeft: '3px solid #cbd5e1', marginBottom: '0.5rem' }}>
                   {log.reflection_journal}
                 </div>
+
+                {/* AI Practice Brief */}
+                <JournalSummaryCard logId={log.id} />
 
                 {/* Review feedback if available */}
                 {log.review_feedback && (

@@ -78,6 +78,19 @@ export interface TrainingLog {
   reviewed_at?: string | null;
 }
 
+export interface JournalSummary {
+  id: string;
+  log_id: string;
+  key_learning: string;
+  practice_reflection: string;
+  topics_for_review: string;
+  source_journal_hash: string;
+  is_stale: boolean;
+  provider: string;
+  generated_at: string;
+  ai_label: string;
+}
+
 export interface ProgressData {
   enrollment_id: string;
   student_id: string;
@@ -350,6 +363,26 @@ export async function getEnrollmentPaceApi(enrollmentId: string): Promise<ApiRes
 
 export async function evaluatePaceApi(enrollmentId: string): Promise<ApiResponse<PaceMetrics>> {
   const response = await fetch(`${API_BASE}/alerts/evaluate/${enrollmentId}`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+// NLP Practice Summary APIs
+export async function getLogSummaryApi(logId: string): Promise<ApiResponse<JournalSummary>> {
+  const response = await fetch(`${API_BASE}/summaries/logs/${logId}/summary`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function generateLogSummaryApi(
+  logId: string,
+  forceRegenerate: boolean = false
+): Promise<ApiResponse<JournalSummary>> {
+  const query = forceRegenerate ? '?force_regenerate=true' : '';
+  const response = await fetch(`${API_BASE}/summaries/logs/${logId}/summary${query}`, {
     method: 'POST',
     headers: getAuthHeaders(),
   });
