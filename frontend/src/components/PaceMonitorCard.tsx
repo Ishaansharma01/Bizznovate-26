@@ -10,7 +10,8 @@ interface PaceMonitorCardProps {
 export const PaceMonitorCard: React.FC<PaceMonitorCardProps> = ({ pace, loading, onRefresh }) => {
   if (loading) {
     return (
-      <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem', textAlign: 'center', color: '#78716c' }}>
+      <div className="bg-white border border-stone-200 rounded-xl p-8 text-center text-stone-500 animate-pulse shadow-xs">
+        <div className="w-8 h-8 mx-auto bg-stone-200 rounded-full mb-2"></div>
         Calculating schedule pace & progress projections...
       </div>
     );
@@ -21,64 +22,45 @@ export const PaceMonitorCard: React.FC<PaceMonitorCardProps> = ({ pace, loading,
   const getStatusDetails = (status: string) => {
     switch (status) {
       case 'on_track':
-        return { label: '✓ On Track', bg: '#dcfce7', text: '#15803d', border: '#bbf7d0' };
+        return { label: '✓ On Track', bg: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
       case 'behind':
-        return { label: '⚠️ Behind Schedule', bg: '#fef3c7', text: '#b45309', border: '#fde68a' };
+        return { label: '⚠️ Behind Schedule', bg: 'bg-amber-100 text-amber-900 border-amber-300' };
       case 'critical_shortfall':
-        return { label: '🚨 Critical Shortfall / Infeasible', bg: '#fee2e2', text: '#991b1b', border: '#fecaca' };
+        return { label: '🚨 Critical Shortfall / Infeasible', bg: 'bg-rose-100 text-rose-800 border-rose-300' };
       case 'overdue':
-        return { label: '⌛ Overdue / Target Passed', bg: '#fef2f2', text: '#b91c1c', border: '#fca5a5' };
+        return { label: '⌛ Overdue / Target Passed', bg: 'bg-red-100 text-red-900 border-red-300' };
       case 'completed':
-        return { label: '🏆 Requirements Met', bg: '#d1fae5', text: '#065f46', border: '#a7f3d0' };
+        return { label: '🏆 Requirements Met', bg: 'bg-teal-100 text-teal-800 border-teal-300' };
       default:
-        return { label: status, bg: '#f1f5f9', text: '#475569', border: '#cbd5e1' };
+        return { label: status, bg: 'bg-stone-100 text-stone-700 border-stone-200' };
     }
   };
 
   const statusStyle = getStatusDetails(pace.pace_status);
 
   return (
-    <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+    <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#1c1917', fontWeight: 700 }}>
-            ⏱️ Progress Pace & Graduation Monitor
+          <h3 className="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2">
+            <span>⏱️</span> Progress Pace & Graduation Monitor
           </h3>
-          <span style={{ fontSize: '0.85rem', color: '#78716c' }}>
+          <p className="text-xs text-stone-500 mt-0.5">
             Linear Schedule Projection · 8h/day Cap Respected · Target: {pace.target_graduation_date}
-          </span>
+          </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
           {onRefresh && (
             <button
               onClick={onRefresh}
-              style={{
-                backgroundColor: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                padding: '0.25rem 0.6rem',
-                borderRadius: '4px',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                color: '#475569',
-              }}
+              className="px-2.5 py-1 bg-stone-50 hover:bg-stone-100 border border-stone-200 text-stone-600 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
             >
               🔄 Refresh
             </button>
           )}
-          <span
-            style={{
-              backgroundColor: statusStyle.bg,
-              color: statusStyle.text,
-              border: `1px solid ${statusStyle.border}`,
-              padding: '0.3rem 0.75rem',
-              borderRadius: '6px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-            }}
-          >
+          <span className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wider ${statusStyle.bg}`}>
             {statusStyle.label}
           </span>
         </div>
@@ -86,108 +68,102 @@ export const PaceMonitorCard: React.FC<PaceMonitorCardProps> = ({ pace, loading,
 
       {/* Status Warning Banner if behind or infeasible */}
       {pace.pace_status !== 'on_track' && pace.pace_status !== 'completed' && (
-        <div style={{
-          backgroundColor: pace.pace_status === 'behind' ? '#fffbeb' : '#fef2f2',
-          border: `1px solid ${pace.pace_status === 'behind' ? '#fef3c7' : '#fecaca'}`,
-          color: pace.pace_status === 'behind' ? '#92400e' : '#991b1b',
-          padding: '0.75rem 1rem',
-          borderRadius: '6px',
-          marginBottom: '1.25rem',
-          fontSize: '0.88rem'
-        }}>
+        <div
+          className={`p-4 rounded-xl border text-xs sm:text-sm ${
+            pace.pace_status === 'behind'
+              ? 'bg-amber-50/80 border-amber-200 text-amber-900'
+              : 'bg-rose-50/80 border-rose-200 text-rose-900'
+          }`}
+        >
           <strong>Pace Notice:</strong> {pace.status_message}
         </div>
       )}
 
-      {/* Expected vs Actual Hours Bar */}
-      <div style={{ marginBottom: '1.5rem', backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', marginBottom: '0.4rem' }}>
-          <div>
-            Expected Progress (Linear): <strong>{pace.expected_progress_hours}h</strong>
-          </div>
-          <div>
-            Actual Approved (Verified): <strong style={{ color: '#0284c7' }}>{pace.approved_hours}h</strong>
-          </div>
+      {/* Expected vs Actual Hours Visual Bar */}
+      <div className="bg-stone-50/80 border border-stone-200 rounded-xl p-4 space-y-2">
+        <div className="flex justify-between items-baseline text-xs sm:text-sm">
+          <span className="text-stone-600">
+            Expected Linear: <strong className="text-stone-900">{pace.expected_progress_hours}h</strong>
+          </span>
+          <span className="text-stone-600">
+            Actual Approved: <strong className="text-sky-700">{pace.approved_hours}h</strong>
+          </span>
         </div>
 
         {/* Progress Comparison Visual */}
-        <div style={{ position: 'relative', width: '100%', height: '16px', backgroundColor: '#e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="relative w-full h-4 bg-stone-200 rounded-full overflow-hidden">
           {/* Expected marker */}
           <div
-            style={{
-              position: 'absolute',
-              width: `${Math.min((pace.expected_progress_hours / pace.required_hours) * 100, 100)}%`,
-              height: '100%',
-              backgroundColor: '#cbd5e1',
-            }}
+            className="absolute h-full bg-stone-300 rounded-full"
+            style={{ width: `${Math.min((pace.expected_progress_hours / pace.required_hours) * 100, 100)}%` }}
           />
           {/* Actual approved */}
           <div
-            style={{
-              position: 'absolute',
-              width: `${Math.min((pace.approved_hours / pace.required_hours) * 100, 100)}%`,
-              height: '100%',
-              backgroundColor: pace.shortfall_hours > 0 ? '#f59e0b' : '#10b981',
-            }}
+            className={`absolute h-full rounded-full transition-all duration-300 ${
+              pace.shortfall_hours > 0 ? 'bg-amber-500' : 'bg-emerald-500'
+            }`}
+            style={{ width: `${Math.min((pace.approved_hours / pace.required_hours) * 100, 100)}%` }}
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#64748b', marginTop: '0.35rem' }}>
+        <div className="flex justify-between text-[11px] text-stone-500 pt-0.5">
           <span>Start: {pace.start_date} ({pace.days_elapsed} days elapsed)</span>
           {pace.shortfall_hours > 0 ? (
-            <span style={{ color: '#b45309', fontWeight: 600 }}>Shortfall: -{pace.shortfall_hours}h behind</span>
+            <span className="text-amber-800 font-bold">Shortfall: -{pace.shortfall_hours}h behind</span>
           ) : (
-            <span style={{ color: '#15803d', fontWeight: 600 }}>0h shortfall · On schedule</span>
+            <span className="text-emerald-700 font-bold">0h shortfall · On schedule</span>
           )}
         </div>
       </div>
 
-      {/* Schedule Metrics Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
-        <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.75rem 1rem', borderRadius: '6px' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Days Remaining</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: pace.days_remaining <= 0 ? '#dc2626' : '#0f172a', marginTop: '0.15rem' }}>
+      {/* Schedule Metrics Grid: 3 responsive columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500">Days Remaining</div>
+          <div className={`text-xl sm:text-2xl font-black mt-1 ${pace.days_remaining <= 0 ? 'text-rose-700' : 'text-stone-900'}`}>
             {pace.days_remaining > 0 ? `${pace.days_remaining} days` : '0 days (Overdue)'}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Target: {pace.target_graduation_date}</div>
+          <div className="text-[11px] text-stone-500 mt-0.5 truncate">Target: {pace.target_graduation_date}</div>
         </div>
 
-        <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.75rem 1rem', borderRadius: '6px' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Required Weekly Pace</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#0284c7', marginTop: '0.15rem' }}>
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500">Required Weekly Pace</div>
+          <div className="text-xl sm:text-2xl font-black text-sky-800 mt-1">
             {pace.required_weekly_pace !== null ? `${pace.required_weekly_pace}h / wk` : 'N/A'}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>To finish remaining {pace.remaining_hours}h</div>
+          <div className="text-[11px] text-stone-500 mt-0.5 truncate">To finish remaining {pace.remaining_hours}h</div>
         </div>
 
-        <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.75rem 1rem', borderRadius: '6px' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Catch-Up Daily Pace</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: pace.is_feasible ? '#16a34a' : '#dc2626', marginTop: '0.15rem' }}>
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500">Catch-Up Daily Pace</div>
+          <div className={`text-xl sm:text-2xl font-black mt-1 ${pace.is_feasible ? 'text-emerald-700' : 'text-rose-700'}`}>
             {pace.realistic_daily_catchup_pace !== null ? `${pace.realistic_daily_catchup_pace}h / day` : 'N/A'}
           </div>
-          <div style={{ fontSize: '0.75rem', color: pace.is_feasible ? '#15803d' : '#dc2626' }}>
-            {pace.is_feasible ? `Within ${pace.daily_cap_hours}h/day cap` : `Cap exceeded: Infeasible`}
+          <div className={`text-[11px] mt-0.5 truncate ${pace.is_feasible ? 'text-emerald-700' : 'text-rose-700'}`}>
+            {pace.is_feasible ? `Within ${pace.daily_cap_hours}h/day cap` : 'Cap exceeded: Infeasible'}
           </div>
         </div>
       </div>
 
       {/* Active Notifications & Alerts */}
       {pace.active_alerts && pace.active_alerts.length > 0 && (
-        <div style={{ backgroundColor: '#fafaf9', border: '1px solid #e7e5e4', borderRadius: '6px', padding: '0.85rem 1rem', marginBottom: '1rem' }}>
-          <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#44403c', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-stone-700">
             📢 Active Pace Shortfall Alerts Dispatched
           </div>
-          {pace.active_alerts.map((a) => (
-            <div key={a.id} style={{ fontSize: '0.82rem', color: '#57534e', display: 'flex', justifyContent: 'space-between', padding: '0.35rem 0', borderBottom: '1px dashed #e7e5e4' }}>
-              <span>Alert: {a.status.toUpperCase()} ({a.shortfall_hours}h shortfall)</span>
-              <span>Dispatched: {new Date(a.created_at).toLocaleDateString()}</span>
-            </div>
-          ))}
+          <div className="divide-y divide-stone-200">
+            {pace.active_alerts.map((a) => (
+              <div key={a.id} className="text-xs text-stone-600 flex justify-between py-2">
+                <span>Alert: <strong className="text-stone-900">{a.status.toUpperCase()}</strong> ({a.shortfall_hours}h shortfall)</span>
+                <span className="text-stone-400">Dispatched: {new Date(a.created_at).toLocaleDateString()}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Safety Disclaimer */}
-      <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic', textAlign: 'center' }}>
+      <div className="text-[11px] text-stone-400 text-center italic">
         * Invariant Notice: Pace estimates provide linear guidance and do not constitute a completion guarantee. Only approved hours count toward certification.
       </div>
     </div>

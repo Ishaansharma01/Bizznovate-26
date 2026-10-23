@@ -13,8 +13,8 @@ export const AdminDashboard: React.FC = () => {
   const [selectedProgId, setSelectedProgId] = useState<string>('');
   const [asanaHours, setAsanaHours] = useState<string>('100');
   const [anatomyHours, setAnatomyHours] = useState<string>('30');
-  const [philosophyHours, setPhilosophyHours] = useState<string>('35');
-  const [teachingHours, setTeachingHours] = useState<string>('35');
+  const [philosophyHours, setPhilosophyHours] = useState<string>('30');
+  const [teachingHours, setTeachingHours] = useState<string>('40');
 
   // Enrollment Form State
   const [enrollStudentId, setEnrollStudentId] = useState('');
@@ -93,99 +93,149 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* Admin Welcome Banner */}
-      <div style={{ backgroundColor: '#faf5ff', border: '1px solid #e9d5ff', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-        <h2 style={{ margin: '0 0 0.25rem', color: '#6b21a8', fontSize: '1.2rem' }}>
-          Administrator Workspace — {user?.full_name}
-        </h2>
-        <p style={{ margin: 0, color: '#7e22ce', fontSize: '0.9rem' }}>
-          Configure program rules, manage canonical category quotas, and enroll trainees into 200-hour TTC batches.
-        </p>
+      <div className="bg-gradient-to-r from-purple-50 via-fuchsia-50 to-purple-100/70 border border-purple-200/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-purple-950 flex items-center gap-2">
+            <span>⚙️</span> Administrator Workspace — {user?.full_name}
+          </h2>
+          <p className="text-xs sm:text-sm text-purple-800 mt-1">
+            Configure program rules, manage canonical category quotas, and enroll trainees into 200-hour TTC batches.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="bg-white/80 border border-purple-200 text-purple-900 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-2xs">
+            Programs: {programs.length} · Trainees: {enrollments.length}
+          </span>
+        </div>
       </div>
 
       {msg && (
-        <div style={{
-          backgroundColor: msg.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          border: `1px solid ${msg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
-          color: msg.type === 'success' ? '#166534' : '#991b1b',
-          padding: '0.75rem 1rem',
-          borderRadius: '6px',
-          marginBottom: '1.25rem',
-          fontSize: '0.9rem'
-        }}>
-          {msg.text}
+        <div
+          className={`p-4 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${
+            msg.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-rose-50 border-rose-200 text-rose-800'
+          }`}
+        >
+          <span>{msg.text}</span>
+          <button onClick={() => setMsg(null)} className="font-bold underline text-xs cursor-pointer ml-3">
+            Dismiss
+          </button>
         </div>
       )}
 
       {/* Program Configuration Section */}
-      <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem', color: '#1c1917' }}>Training Programs & Quota Configuration</h3>
+      <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
+        <h3 className="text-lg font-bold text-stone-900 flex items-center gap-2">
+          <span>📜</span> Training Programs & Quota Configuration
+        </h3>
+
         {loading ? (
-          <p style={{ color: '#78716c' }}>Loading program rules...</p>
+          <p className="text-xs text-stone-500">Loading program rules...</p>
         ) : (
-          <div>
+          <div className="space-y-4">
             {programs.map((p) => (
-              <div key={p.id} style={{ border: '1px solid #e2e8f0', borderRadius: '6px', padding: '1.25rem', marginBottom: '1rem', backgroundColor: '#f8fafc' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <strong style={{ fontSize: '1.05rem', color: '#0f172a' }}>{p.name}</strong> ({p.code})
+              <div
+                key={p.id}
+                className="border border-stone-200 rounded-xl p-4 sm:p-5 bg-stone-50/70 space-y-3"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="font-bold text-base text-stone-900">
+                    {p.name} <span className="text-stone-500 font-mono font-normal text-xs">({p.code})</span>
                   </div>
                   {p.category_quotas_configured ? (
-                    <span style={{ backgroundColor: '#dcfce7', color: '#15803d', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
-                      ✓ Quotas Configured
+                    <span className="inline-block text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded border border-emerald-300">
+                      ✓ Canonical Quotas Configured
                     </span>
                   ) : (
-                    <span style={{ backgroundColor: '#fef3c7', color: '#b45309', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <span className="inline-block text-[11px] font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded border border-amber-300">
                       ⚠️ Distribution: CONFIGURATION_REQUIRED
                     </span>
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem', fontSize: '0.85rem', marginTop: '0.75rem' }}>
-                  <div>Total Hours Required: <strong>{p.required_hours}h</strong></div>
-                  <div>Daily Max Limit: <strong>{p.daily_max_hours}h/day</strong></div>
-                  <div>Backdating Window: <strong>{p.backdating_window_hours}h</strong></div>
-                  <div>Timezone: <strong>{p.timezone}</strong></div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                  <div className="bg-white p-2.5 rounded-lg border border-stone-200">
+                    <span className="text-stone-500 text-[10px] uppercase font-semibold block">Total Required</span>
+                    <strong className="text-stone-900 font-bold">{p.required_hours}h</strong>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-lg border border-stone-200">
+                    <span className="text-stone-500 text-[10px] uppercase font-semibold block">Daily Limit</span>
+                    <strong className="text-stone-900 font-bold">{p.daily_max_hours}h / day</strong>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-lg border border-stone-200">
+                    <span className="text-stone-500 text-[10px] uppercase font-semibold block">Backdating Window</span>
+                    <strong className="text-stone-900 font-bold">{p.backdating_window_hours}h max</strong>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-lg border border-stone-200">
+                    <span className="text-stone-500 text-[10px] uppercase font-semibold block">Authoritative Timezone</span>
+                    <strong className="text-stone-900 font-bold">{p.timezone}</strong>
+                  </div>
                 </div>
 
                 {/* Show Current Quotas if set */}
                 {p.category_quotas && (
-                  <div style={{ marginTop: '0.75rem', padding: '0.6rem', backgroundColor: '#fff', borderRadius: '4px', fontSize: '0.82rem', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontWeight: 600, color: '#334155' }}>Active Quotas:</span>{' '}
-                    Asana: {p.category_quotas.asana_practice || 0}h |{' '}
-                    Anatomy: {p.category_quotas.anatomy || 0}h |{' '}
-                    Philosophy: {p.category_quotas.yoga_philosophy || 0}h |{' '}
-                    Practical: {p.category_quotas.practical_teaching || 0}h
+                  <div className="p-3 bg-white rounded-lg border border-stone-200 text-xs flex flex-wrap gap-x-4 gap-y-1">
+                    <span className="font-bold text-stone-700">Active Curriculum Quotas:</span>
+                    <span>Asana: <strong>{p.category_quotas.asana_practice || 0}h</strong></span>
+                    <span>Anatomy: <strong>{p.category_quotas.anatomy || 0}h</strong></span>
+                    <span>Philosophy: <strong>{p.category_quotas.yoga_philosophy || 0}h</strong></span>
+                    <span>Teaching: <strong>{p.category_quotas.practical_teaching || 0}h</strong></span>
                   </div>
                 )}
               </div>
             ))}
 
             {/* Quota Config Form */}
-            <form onSubmit={handleUpdateQuotas} style={{ marginTop: '1.25rem', padding: '1rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#fff' }}>
-              <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', color: '#1e293b' }}>
-                Configure Category Hour Quotas (Non-invented; fully configurable per program)
+            <form onSubmit={handleUpdateQuotas} className="p-4 sm:p-5 border border-stone-200 rounded-xl bg-stone-50/50 space-y-4">
+              <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-700">
+                Update Category Hour Quotas for Selected Program
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Asana Practice (h)</label>
-                  <input type="number" value={asanaHours} onChange={(e) => setAsanaHours(e.target.value)} style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                  <label className="text-[11px] font-semibold text-stone-600 block mb-1">Asana Practice (h)</label>
+                  <input
+                    type="number"
+                    value={asanaHours}
+                    onChange={(e) => setAsanaHours(e.target.value)}
+                    className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs focus:ring-2 focus:ring-sky-500"
+                  />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Anatomy (h)</label>
-                  <input type="number" value={anatomyHours} onChange={(e) => setAnatomyHours(e.target.value)} style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                  <label className="text-[11px] font-semibold text-stone-600 block mb-1">Anatomy (h)</label>
+                  <input
+                    type="number"
+                    value={anatomyHours}
+                    onChange={(e) => setAnatomyHours(e.target.value)}
+                    className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs focus:ring-2 focus:ring-sky-500"
+                  />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Yoga Philosophy (h)</label>
-                  <input type="number" value={philosophyHours} onChange={(e) => setPhilosophyHours(e.target.value)} style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                  <label className="text-[11px] font-semibold text-stone-600 block mb-1">Yoga Philosophy (h)</label>
+                  <input
+                    type="number"
+                    value={philosophyHours}
+                    onChange={(e) => setPhilosophyHours(e.target.value)}
+                    className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs focus:ring-2 focus:ring-sky-500"
+                  />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Practical Teaching (h)</label>
-                  <input type="number" value={teachingHours} onChange={(e) => setTeachingHours(e.target.value)} style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                  <label className="text-[11px] font-semibold text-stone-600 block mb-1">Practical Teaching (h)</label>
+                  <input
+                    type="number"
+                    value={teachingHours}
+                    onChange={(e) => setTeachingHours(e.target.value)}
+                    className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs focus:ring-2 focus:ring-sky-500"
+                  />
                 </div>
               </div>
-              <button type="submit" style={{ backgroundColor: '#0284c7', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
+              <button
+                type="submit"
+                className="px-5 py-2.5 bg-sky-700 hover:bg-sky-800 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer transition-colors"
+              >
                 Save Program Quotas
               </button>
             </form>
@@ -194,76 +244,83 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Enrollment Management */}
-      <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem', color: '#1c1917' }}>Trainee Enrollments</h3>
+      <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
+        <h3 className="text-lg font-bold text-stone-900 flex items-center gap-2">
+          <span>👥</span> Trainee Batch Enrollments
+        </h3>
 
-        <form onSubmit={handleCreateEnrollment} style={{ padding: '1rem', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#f8fafc', marginBottom: '1.5rem' }}>
-          <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', color: '#1e293b' }}>Enroll Student</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+        <form onSubmit={handleCreateEnrollment} className="p-4 sm:p-5 border border-stone-200 rounded-xl bg-stone-50/50 space-y-4">
+          <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-700">Enroll New Trainee</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Student UUID / ID</label>
+              <label className="text-[11px] font-semibold text-stone-600 block mb-1">Student UUID / ID</label>
               <input
                 type="text"
                 placeholder="Paste Student UUID"
                 value={enrollStudentId}
                 onChange={(e) => setEnrollStudentId(e.target.value)}
                 required
-                style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs font-mono focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <div>
-              <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Enrollment Start Date</label>
+              <label className="text-[11px] font-semibold text-stone-600 block mb-1">Enrollment Date</label>
               <input
                 type="date"
                 value={enrollStartDate}
                 onChange={(e) => setEnrollStartDate(e.target.value)}
                 required
-                style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <div>
-              <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Target Graduation Date</label>
+              <label className="text-[11px] font-semibold text-stone-600 block mb-1">Target Graduation Date</label>
               <input
                 type="date"
                 value={enrollTargetDate}
                 onChange={(e) => setEnrollTargetDate(e.target.value)}
                 required
-                style={{ width: '100%', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                className="w-full p-2 bg-white rounded-lg border border-stone-300 text-xs focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
-          <button type="submit" style={{ backgroundColor: '#16a34a', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
+          <button
+            type="submit"
+            className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold shadow-xs cursor-pointer transition-colors"
+          >
             Submit Enrollment
           </button>
         </form>
 
-        {/* Existing Enrollments Table */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', color: '#475569' }}>
-              <th style={{ padding: '0.6rem' }}>Student Name</th>
-              <th style={{ padding: '0.6rem' }}>Student ID</th>
-              <th style={{ padding: '0.6rem' }}>Program</th>
-              <th style={{ padding: '0.6rem' }}>Dates (Start → Target)</th>
-              <th style={{ padding: '0.6rem' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {enrollments.map((e) => (
-              <tr key={e.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '0.6rem', fontWeight: 600, color: '#0f172a' }}>{e.student_name}</td>
-                <td style={{ padding: '0.6rem', fontFamily: 'monospace', fontSize: '0.78rem', color: '#64748b' }}>{e.student_id}</td>
-                <td style={{ padding: '0.6rem', color: '#0f172a' }}>{e.program_code}</td>
-                <td style={{ padding: '0.6rem', color: '#334155' }}>{e.enrollment_date} → {e.target_graduation_date}</td>
-                <td style={{ padding: '0.6rem' }}>
-                  <span style={{ backgroundColor: '#dcfce7', color: '#15803d', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
-                    {e.status}
-                  </span>
-                </td>
+        {/* Existing Enrollments Table with responsive horizontal overflow */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-stone-200 text-stone-500 uppercase text-[11px]">
+                <th className="py-3 px-3">Student Name</th>
+                <th className="py-3 px-3">Student ID</th>
+                <th className="py-3 px-3">Program</th>
+                <th className="py-3 px-3">Dates (Start → Target)</th>
+                <th className="py-3 px-3">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-stone-100">
+              {enrollments.map((e) => (
+                <tr key={e.id} className="hover:bg-stone-50/70">
+                  <td className="py-3 px-3 font-bold text-stone-900">{e.student_name}</td>
+                  <td className="py-3 px-3 font-mono text-[11px] text-stone-500">{e.student_id}</td>
+                  <td className="py-3 px-3 font-semibold text-stone-800">{e.program_code}</td>
+                  <td className="py-3 px-3 text-stone-600">{e.enrollment_date} → {e.target_graduation_date}</td>
+                  <td className="py-3 px-3">
+                    <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 uppercase">
+                      {e.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

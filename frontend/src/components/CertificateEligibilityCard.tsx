@@ -269,7 +269,7 @@ export const CertificateEligibilityCard: React.FC<Props> = ({ enrollmentId, onCe
               Graduation Certification Invariants (6 Mandatory Checks)
             </h4>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
               {/* 1. Required Hours */}
               <div className="p-3 bg-stone-50 rounded-lg border border-stone-200 flex items-start space-x-3">
                 <div className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${

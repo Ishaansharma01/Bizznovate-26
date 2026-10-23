@@ -76,7 +76,7 @@ export const PublicCertificateVerifier: React.FC<Props> = ({ initialCertificateI
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4 font-sans">
+    <div className="w-full max-w-5xl 2xl:max-w-6xl mx-auto py-6 sm:py-8 px-2 sm:px-4 font-sans space-y-6">
       {/* Top Header & Branding */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 text-amber-800 text-3xl mb-3 shadow-inner">

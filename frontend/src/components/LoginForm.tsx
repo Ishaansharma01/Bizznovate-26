@@ -20,22 +20,23 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '440px', margin: '2rem auto', backgroundColor: '#fff', padding: '2rem', borderRadius: '12px', border: '1px solid #e7e5e4', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-        <span style={{ fontSize: '2.5rem' }}>🧘</span>
-        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0.5rem 0 0.25rem', color: '#1c1917' }}>Sign In to Portal</h2>
-        <p style={{ color: '#78716c', fontSize: '0.88rem', margin: 0 }}>Role-Based Access Control for Students, Faculty & Admins</p>
+    <div className="w-full max-w-md sm:max-w-lg mx-auto bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6 my-6 sm:my-10">
+      <div className="text-center space-y-1">
+        <span className="text-4xl">🧘</span>
+        <h2 className="text-xl sm:text-2xl font-bold text-stone-900 tracking-tight">Sign In to Portal</h2>
+        <p className="text-xs sm:text-sm text-stone-500">Role-Based Access Control for Students, Faculty & Admins</p>
       </div>
 
       {error && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.75rem 1rem', borderRadius: '6px', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
-          <strong>Error:</strong> {error}
+        <div className="bg-rose-50 border border-rose-200 text-rose-800 p-3 rounded-xl text-xs sm:text-sm flex items-center justify-between">
+          <span><strong>Error:</strong> {error}</span>
+          <button onClick={clearError} className="text-xs underline font-bold cursor-pointer ml-2">Dismiss</button>
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#44403c', marginBottom: '0.4rem' }}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
             Email Address
           </label>
           <input
@@ -44,12 +45,12 @@ export const LoginForm: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="e.g. student1@shailjayoga.com"
             required
-            style={{ width: '100%', padding: '0.65rem 0.75rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.92rem', boxSizing: 'border-box' }}
+            className="w-full p-2.5 sm:p-3 bg-white border border-stone-300 rounded-lg text-xs sm:text-sm text-stone-900 focus:ring-2 focus:ring-sky-500"
           />
         </div>
 
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#44403c', marginBottom: '0.4rem' }}>
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
             Password
           </label>
           <input
@@ -58,69 +59,57 @@ export const LoginForm: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password (default: password123)"
             required
-            style={{ width: '100%', padding: '0.65rem 0.75rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.92rem', boxSizing: 'border-box' }}
+            className="w-full p-2.5 sm:p-3 bg-white border border-stone-300 rounded-lg text-xs sm:text-sm text-stone-900 focus:ring-2 focus:ring-sky-500"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          style={{
-            width: '100%',
-            backgroundColor: '#0c4a6e',
-            color: '#fff',
-            padding: '0.75rem',
-            borderRadius: '6px',
-            border: 'none',
-            fontSize: '0.95rem',
-            fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1,
-            transition: 'background-color 0.15s ease',
-          }}
+          className="w-full py-3 bg-sky-900 hover:bg-sky-950 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs cursor-pointer transition-colors disabled:opacity-50"
         >
           {loading ? 'Authenticating...' : 'Sign In'}
         </button>
       </form>
 
       {/* Quick Testing Provisioned Accounts */}
-      <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px dashed #e7e5e4' }}>
-        <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.6rem', textAlign: 'center' }}>
+      <div className="pt-4 border-t border-dashed border-stone-200 space-y-2.5">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-stone-400 text-center">
           One-Click Demo Accounts
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+        <div className="grid grid-cols-2 gap-2 text-xs">
           <button
             type="button"
             onClick={() => handleQuickLogin('student1@shailjayoga.com', 'password123')}
-            style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
+            className="p-2 border border-stone-200 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-800 font-semibold cursor-pointer transition-colors text-center"
           >
             👤 Student 1 (Ananya)
           </button>
           <button
             type="button"
             onClick={() => handleQuickLogin('student2@shailjayoga.com', 'password123')}
-            style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
+            className="p-2 border border-stone-200 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-800 font-semibold cursor-pointer transition-colors text-center"
           >
             👤 Student 2 (Dev)
           </button>
           <button
             type="button"
             onClick={() => handleQuickLogin('faculty@shailjayoga.com', 'password123')}
-            style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
+            className="p-2 border border-stone-200 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-800 font-semibold cursor-pointer transition-colors text-center"
           >
             🎓 Faculty Reviewer
           </button>
           <button
             type="button"
             onClick={() => handleQuickLogin('issuer@shailjayoga.com', 'password123')}
-            style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
+            className="p-2 border border-stone-200 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-800 font-semibold cursor-pointer transition-colors text-center"
           >
             📜 Certificate Issuer
           </button>
           <button
             type="button"
             onClick={() => handleQuickLogin('admin@shailjayoga.com', 'password123')}
-            style={{ gridColumn: 'span 2', fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
+            className="col-span-2 p-2 border border-stone-200 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-800 font-semibold cursor-pointer transition-colors text-center"
           >
             ⚙️ Master Administrator
           </button>

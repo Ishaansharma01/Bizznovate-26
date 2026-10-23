@@ -97,50 +97,54 @@ export const FacultyDashboard: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* Faculty Welcome Banner */}
-      <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-        <h2 style={{ margin: '0 0 0.25rem', color: '#1e40af', fontSize: '1.25rem', fontWeight: 700 }}>
-          Namaste, {user?.full_name}!
-        </h2>
-        <p style={{ margin: 0, color: '#2563eb', fontSize: '0.9rem' }}>
-          Role: <span style={{ fontWeight: 600 }}>Faculty Reviewer</span> · Authoritative log review, progress verification & pace shortfall monitoring
-        </p>
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-100/70 border border-blue-200/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-blue-950 flex items-center gap-2">
+            <span>🎓</span>
+            Namaste, {user?.full_name}!
+          </h2>
+          <p className="text-xs sm:text-sm text-blue-800 mt-1">
+            Role: <span className="font-semibold text-blue-900">Faculty Reviewer</span> · Authoritative log review, progress verification & pace shortfall monitoring
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="bg-white/80 border border-blue-200 text-blue-900 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-2xs">
+            Enrolled Trainees: {enrollments.length}
+          </span>
+        </div>
       </div>
 
-      {/* Review Queue Component */}
+      {/* Review Queue Component: Full Width */}
       <FacultyReviewQueue />
 
-      {/* Student Progress & Pace Inspection */}
-      <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ margin: '0 0 1rem', fontSize: '1.15rem', color: '#1c1917', fontWeight: 700 }}>
-          🎓 Trainee Verified Progress & Schedule Pace Inspection
+      {/* Student Progress & Pace Inspection: Full Width */}
+      <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
+        <h3 className="text-lg font-bold text-stone-900 flex items-center gap-2">
+          <span>🔍</span> Trainee Verified Progress & Schedule Pace Inspection
         </h3>
 
         {loading ? (
-          <p style={{ color: '#78716c' }}>Loading enrolled trainees...</p>
+          <p className="text-xs text-stone-500">Loading enrolled trainees...</p>
         ) : enrollments.length === 0 ? (
-          <p style={{ color: '#78716c' }}>No students currently enrolled.</p>
+          <p className="text-xs text-stone-500">No students currently enrolled.</p>
         ) : (
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>
-              Select a Trainee to Inspect Verified Progress, Pace & Sign-Off:
+          <div className="space-y-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">
+              Select Trainee to Inspect Verified Progress, Pace & Sign-Off:
             </label>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div className="flex flex-wrap gap-2">
               {enrollments.map((e) => (
                 <button
                   key={e.id}
                   onClick={() => handleInspectStudent(e.id)}
-                  style={{
-                    backgroundColor: selectedEnrollmentId === e.id ? '#0284c7' : '#f8fafc',
-                    color: selectedEnrollmentId === e.id ? '#fff' : '#0f172a',
-                    border: '1px solid #cbd5e1',
-                    padding: '0.5rem 0.85rem',
-                    borderRadius: '6px',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-2xs ${
+                    selectedEnrollmentId === e.id
+                      ? 'bg-sky-700 text-white border-sky-800'
+                      : 'bg-stone-50 hover:bg-stone-100 text-stone-800 border-stone-200'
+                  }`}
                 >
                   👤 {e.student_name} ({e.program_code})
                 </button>
@@ -151,37 +155,32 @@ export const FacultyDashboard: React.FC = () => {
 
         {/* Display inspected student progress & pace */}
         {selectedEnrollmentId && (
-          <div>
+          <div className="space-y-6 pt-2 border-t border-stone-100">
             {signoffMsg && (
-              <div style={{
-                backgroundColor: signoffMsg.type === 'success' ? '#f0fdf4' : '#fef2f2',
-                border: `1px solid ${signoffMsg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
-                color: signoffMsg.type === 'success' ? '#166534' : '#991b1b',
-                padding: '0.75rem 1rem',
-                borderRadius: '6px',
-                marginBottom: '1rem',
-                fontSize: '0.88rem'
-              }}>
-                {signoffMsg.text}
+              <div
+                className={`p-4 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${
+                  signoffMsg.type === 'success'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-rose-50 border-rose-200 text-rose-800'
+                }`}
+              >
+                <span>{signoffMsg.text}</span>
+                <button
+                  onClick={() => setSignoffMsg(null)}
+                  className="font-bold underline text-xs cursor-pointer ml-3"
+                >
+                  Dismiss
+                </button>
               </div>
             )}
 
             <VerifiedProgressCard progress={inspectedProgress} loading={inspectLoading} />
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+            <div className="flex justify-end">
               <button
                 onClick={handleTriggerPaceEvaluation}
                 disabled={evalLoading}
-                style={{
-                  backgroundColor: '#7c3aed',
-                  color: '#fff',
-                  border: 'none',
-                  padding: '0.45rem 0.9rem',
-                  borderRadius: '6px',
-                  fontSize: '0.82rem',
-                  fontWeight: 600,
-                  cursor: evalLoading ? 'not-allowed' : 'pointer',
-                }}
+                className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {evalLoading ? 'Evaluating Pace...' : '⚡ Trigger Trainee Pace Check & Alert'}
               </button>
@@ -190,7 +189,7 @@ export const FacultyDashboard: React.FC = () => {
             <PaceMonitorCard pace={inspectedPace} loading={inspectLoading} />
 
             {/* Certification Eligibility and Issuance Card */}
-            <div style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
+            <div>
               <CertificateEligibilityCard
                 enrollmentId={selectedEnrollmentId}
                 onCertificateIssued={() => handleInspectStudent(selectedEnrollmentId)}
@@ -198,12 +197,12 @@ export const FacultyDashboard: React.FC = () => {
             </div>
 
             {inspectedProgress && (
-              <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fafaf9', border: '1px solid #e7e5e4', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div className="p-4 bg-stone-50 border border-stone-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div>
-                  <div style={{ fontWeight: 600, color: '#1c1917', fontSize: '0.95rem' }}>
+                  <div className="font-bold text-stone-900 text-sm">
                     Faculty Final Sign-Off Status:
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: inspectedProgress.final_faculty_signoff ? '#166534' : '#b45309' }}>
+                  <div className={`mt-0.5 font-medium ${inspectedProgress.final_faculty_signoff ? 'text-emerald-700' : 'text-amber-700'}`}>
                     {inspectedProgress.final_faculty_signoff
                       ? '✓ Complete: Trainee is signed off by faculty for certification.'
                       : 'Pending: Final faculty sign-off required prior to certificate issuance.'}
@@ -213,16 +212,7 @@ export const FacultyDashboard: React.FC = () => {
                 {!inspectedProgress.final_faculty_signoff && (
                   <button
                     onClick={handleSignoff}
-                    style={{
-                      backgroundColor: '#16a34a',
-                      color: '#fff',
-                      border: 'none',
-                      padding: '0.55rem 1.1rem',
-                      borderRadius: '6px',
-                      fontWeight: 600,
-                      fontSize: '0.88rem',
-                      cursor: 'pointer',
-                    }}
+                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl text-xs shadow-xs cursor-pointer transition-colors"
                   >
                     Complete Final Faculty Sign-Off
                   </button>

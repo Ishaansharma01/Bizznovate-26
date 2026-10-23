@@ -19,90 +19,83 @@ const MainLayout: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'system-ui' }}>
-        <p style={{ color: '#78716c', fontSize: '1.1rem' }}>Loading application session...</p>
+      <div className="flex justify-center items-center h-screen bg-stone-50 font-sans">
+        <div className="text-center space-y-2">
+          <div className="text-4xl animate-bounce">🧘</div>
+          <p className="text-stone-600 font-medium text-base">Loading Shailja Yoga application session...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '1020px', margin: '0 auto', padding: '1.5rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
-      {/* Top Navbar */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e7e5e4', paddingBottom: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div
-          onClick={() => setView('app')}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
-        >
-          <span style={{ fontSize: '2.2rem' }}>🧘</span>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#1c1917', fontWeight: 700 }}>
-              Shailja Yoga
-            </h1>
-            <p style={{ margin: '0.15rem 0 0', color: '#78716c', fontSize: '0.88rem' }}>
-              200-Hour TTC Verification & Hours Logger
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {/* Public Verification Quick Switch Button */}
-          <button
-            onClick={() => setView(view === 'verify' ? 'app' : 'verify')}
-            style={{
-              backgroundColor: view === 'verify' ? '#fef3c7' : '#f8fafc',
-              color: view === 'verify' ? '#92400e' : '#475569',
-              border: '1px solid #cbd5e1',
-              padding: '0.45rem 0.85rem',
-              borderRadius: '6px',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-            }}
+    <div className="min-h-screen w-full bg-stone-50 flex flex-col font-sans text-stone-900">
+      {/* Top Navbar: Full-width responsive with crisp borders & container bounds */}
+      <header className="w-full bg-white border-b border-stone-200 sticky top-0 z-40 shadow-xs backdrop-blur-md bg-white/95">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-3.5 flex justify-between items-center flex-wrap gap-4">
+          <div
+            onClick={() => setView('app')}
+            className="flex items-center gap-3.5 cursor-pointer group"
           >
-            <span>{view === 'verify' ? '👤 Portal View' : '🔍 Verify Certificate'}</span>
-          </button>
-
-          {user && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#1c1917' }}>{user.full_name}</div>
-                <span style={{
-                  backgroundColor: user.role === 'admin' ? '#f3e8ff' : user.role === 'faculty' ? '#dbeafe' : '#dcfce7',
-                  color: user.role === 'admin' ? '#7e22ce' : user.role === 'faculty' ? '#1e40af' : '#15803d',
-                  padding: '0.15rem 0.5rem',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                }}>
-                  {user.role}
+            <span className="text-3xl sm:text-4xl transition-transform group-hover:scale-105">🧘</span>
+            <div>
+              <h1 className="m-0 text-lg sm:text-xl md:text-2xl font-bold text-stone-900 tracking-tight flex items-center gap-2">
+                Shailja Yoga
+                <span className="hidden sm:inline-block text-[11px] font-semibold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">
+                  TTC 200
                 </span>
-              </div>
-              <button
-                onClick={logout}
-                style={{
-                  backgroundColor: '#fee2e2',
-                  color: '#991b1b',
-                  border: '1px solid #fecaca',
-                  padding: '0.45rem 0.85rem',
-                  borderRadius: '6px',
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                }}
-              >
-                Sign Out
-              </button>
+              </h1>
+              <p className="m-0 text-xs text-stone-500 font-medium">
+                200-Hour TTC Verification & Practice Hours Logger
+              </p>
             </div>
-          )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Public Verification Quick Switch Button */}
+            <button
+              onClick={() => setView(view === 'verify' ? 'app' : 'verify')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                view === 'verify'
+                  ? 'bg-amber-100/80 text-amber-900 border-amber-300'
+                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-300'
+              }`}
+            >
+              <span>{view === 'verify' ? '👤 Portal View' : '🔍 Verify Certificate'}</span>
+            </button>
+
+            {user && (
+              <div className="flex items-center gap-3 pl-2 sm:pl-3 border-l border-stone-200">
+                <div className="text-right hidden sm:block">
+                  <div className="font-semibold text-xs text-stone-900">{user.full_name}</div>
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                      user.role === 'admin'
+                        ? 'bg-purple-100 text-purple-800'
+                        : user.role === 'faculty'
+                        ? 'bg-blue-100 text-blue-800'
+                        : user.role === 'certificate_issuer'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-emerald-100 text-emerald-800'
+                    }`}
+                  >
+                    {user.role.replace('_', ' ')}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* Main Body */}
-      <main>
+      {/* Main Body: Full width responsive container fitting all screen resolutions */}
+      <main className="flex-1 w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8">
         {view === 'verify' ? (
           <PublicCertificateVerifier onBackToApp={() => setView('app')} />
         ) : !user ? (
@@ -116,9 +109,12 @@ const MainLayout: React.FC = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer style={{ marginTop: '3.5rem', paddingTop: '1.5rem', borderTop: '1px solid #e7e5e4', textAlign: 'center', color: '#a8a29e', fontSize: '0.82rem' }}>
-        Shailja Yoga Academy · 200-Hour TTC Verification Platform · All Invariants Enforced
+      {/* Footer: Full width responsive footer */}
+      <footer className="w-full bg-white border-t border-stone-200 mt-auto py-5 text-center text-xs text-stone-500">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>Shailja Yoga Academy · Official 200-Hour TTC Verification Platform</span>
+          <span className="text-[11px] text-stone-400">All Invariants Enforced · Non-Negotiable Graduation Rules</span>
+        </div>
       </footer>
     </div>
   );

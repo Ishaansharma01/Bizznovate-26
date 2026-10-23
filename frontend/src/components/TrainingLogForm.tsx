@@ -65,7 +65,7 @@ export const TrainingLogForm: React.FC<TrainingLogFormProps> = ({ enrollmentId, 
 
       if (res.success && res.data) {
         setSuccessMsg(
-          `Log for ${res.data.duration_hours}h (${res.data.category}) submitted successfully and queued as PENDING for faculty review.`
+          `Log for ${res.data.duration_hours}h (${res.data.category.replace(/_/g, ' ')}) submitted successfully and queued as PENDING for faculty review.`
         );
         // Clear only journal and reset duration; retain date for convenience
         setJournal('');
@@ -88,124 +88,129 @@ export const TrainingLogForm: React.FC<TrainingLogFormProps> = ({ enrollmentId, 
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#1c1917', fontWeight: 700 }}>
-          📝 Daily Training Log Submission
+    <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+        <h3 className="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2">
+          <span>📝</span> Log Practice Session
         </h3>
-        <span style={{ fontSize: '0.8rem', backgroundColor: '#f5f5f4', padding: '0.2rem 0.6rem', borderRadius: '4px', color: '#57534e' }}>
-          Server-Validated · 8h Daily Cap · 48h Window
+        <span className="text-[10px] uppercase font-bold bg-stone-100 text-stone-600 px-2 py-0.5 rounded border border-stone-200 self-start sm:self-auto">
+          8h Daily Cap · 48h Window
         </span>
       </div>
 
       {errorMsg && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.75rem 1rem', borderRadius: '6px', fontSize: '0.88rem', marginBottom: '1rem' }}>
-          <strong>Submission Error:</strong> {errorMsg}
+        <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center justify-between">
+          <span><strong>Error:</strong> {errorMsg}</span>
+          <button onClick={() => setErrorMsg(null)} className="font-bold underline text-xs cursor-pointer ml-2">
+            Dismiss
+          </button>
         </div>
       )}
 
       {successMsg && (
-        <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.75rem 1rem', borderRadius: '6px', fontSize: '0.88rem', marginBottom: '1rem' }}>
-          <strong>Success:</strong> {successMsg}
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center justify-between">
+          <span><strong>Success:</strong> {successMsg}</span>
+          <button onClick={() => setSuccessMsg(null)} className="font-bold underline text-xs cursor-pointer ml-2">
+            Dismiss
+          </button>
         </div>
       )}
 
       {/* Real-time daily cap allowance preview */}
       {capacity && (
-        <div style={{ display: 'flex', gap: '1rem', backgroundColor: '#fafaf9', padding: '0.65rem 1rem', borderRadius: '6px', marginBottom: '1.25rem', fontSize: '0.85rem', border: '1px solid #e7e5e4' }}>
+        <div className="grid grid-cols-3 gap-2 bg-stone-50 p-3 rounded-xl border border-stone-200 text-xs">
           <div>
-            <span style={{ color: '#78716c' }}>Date:</span> <strong>{capacity.practice_date}</strong>
+            <span className="text-stone-400 text-[10px] uppercase block font-semibold">Date</span>
+            <span className="font-semibold text-stone-800 truncate block mt-0.5">{capacity.practice_date}</span>
           </div>
           <div>
-            <span style={{ color: '#78716c' }}>Already Logged:</span>{' '}
-            <strong style={{ color: '#0369a1' }}>{capacity.existing_hours}h</strong> / {capacity.daily_max_hours}h
+            <span className="text-stone-400 text-[10px] uppercase block font-semibold">Logged</span>
+            <span className="font-bold text-sky-800 block mt-0.5">{capacity.existing_hours}h / {capacity.daily_max_hours}h</span>
           </div>
           <div>
-            <span style={{ color: '#78716c' }}>Remaining Cap:</span>{' '}
-            <strong style={{ color: capacity.remaining_hours > 0 ? '#15803d' : '#b91c1c' }}>
-              {capacity.remaining_hours}h remaining
-            </strong>
+            <span className="text-stone-400 text-[10px] uppercase block font-semibold">Remaining</span>
+            <span className={`font-bold block mt-0.5 ${capacity.remaining_hours > 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+              {capacity.remaining_hours}h left
+            </span>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-          {/* Practice Date */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#44403c', marginBottom: '0.35rem' }}>
-              Practice Date (Max 48h Past)
-            </label>
-            <input
-              type="date"
-              max={todayStr}
-              value={practiceDate}
-              onChange={(e) => setPracticeDate(e.target.value)}
-              required
-              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.9rem', boxSizing: 'border-box' }}
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Practice Date */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
+            Practice Date (Within 48h Window)
+          </label>
+          <input
+            type="date"
+            max={todayStr}
+            value={practiceDate}
+            onChange={(e) => setPracticeDate(e.target.value)}
+            required
+            className="w-full p-2.5 bg-white border border-stone-300 rounded-lg text-xs text-stone-900 focus:ring-2 focus:ring-sky-500"
+          />
+        </div>
 
-          {/* Canonical Category */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#44403c', marginBottom: '0.35rem' }}>
-              Canonical Category
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.9rem', boxSizing: 'border-box', backgroundColor: '#fff' }}
-            >
-              <option value="asana_practice">Asana Practice (asana_practice)</option>
-              <option value="anatomy">Anatomy & Physiology (anatomy)</option>
-              <option value="yoga_philosophy">Yoga Philosophy & Ethics (yoga_philosophy)</option>
-              <option value="practical_teaching">Practical Teaching (practical_teaching)</option>
-            </select>
-          </div>
+        {/* Canonical Category */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
+            Canonical Category
+          </label>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full p-2.5 bg-white border border-stone-300 rounded-lg text-xs text-stone-900 focus:ring-2 focus:ring-sky-500"
+          >
+            <option value="asana_practice">Asana Practice</option>
+            <option value="anatomy">Anatomy & Physiology</option>
+            <option value="yoga_philosophy">Yoga Philosophy & Ethics</option>
+            <option value="practical_teaching">Practical Teaching & Methodology</option>
+          </select>
+        </div>
 
-          {/* Duration in Hours and Minutes */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#44403c', marginBottom: '0.35rem' }}>
-              Duration: {totalMinutes} mins ({(totalMinutes / 60).toFixed(2)}h)
-            </label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <div style={{ flex: 1 }}>
-                <input
-                  type="number"
-                  min="0"
-                  max="8"
-                  value={hours}
-                  onChange={(e) => setHours(e.target.value)}
-                  placeholder="Hours"
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                />
-              </div>
-              <span style={{ alignSelf: 'center', color: '#78716c', fontWeight: 600 }}>h</span>
-              <div style={{ flex: 1 }}>
-                <input
-                  type="number"
-                  min="0"
-                  max="59"
-                  step="5"
-                  value={minutes}
-                  onChange={(e) => setMinutes(e.target.value)}
-                  placeholder="Minutes"
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.9rem', boxSizing: 'border-box' }}
-                />
-              </div>
-              <span style={{ alignSelf: 'center', color: '#78716c', fontWeight: 600 }}>m</span>
+        {/* Duration in Hours and Minutes */}
+        <div>
+          <label className="block text-xs font-semibold text-stone-700 mb-1">
+            Duration: <span className="text-sky-700 font-bold">{totalMinutes} mins ({(totalMinutes / 60).toFixed(2)}h)</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <input
+                type="number"
+                min="0"
+                max="8"
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+                placeholder="Hours"
+                className="w-full p-2.5 bg-white border border-stone-300 rounded-lg text-xs text-stone-900 focus:ring-2 focus:ring-sky-500"
+              />
             </div>
+            <span className="text-xs font-semibold text-stone-500">hrs</span>
+            <div className="flex-1">
+              <input
+                type="number"
+                min="0"
+                max="59"
+                step="5"
+                value={minutes}
+                onChange={(e) => setMinutes(e.target.value)}
+                placeholder="Minutes"
+                className="w-full p-2.5 bg-white border border-stone-300 rounded-lg text-xs text-stone-900 focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
+            <span className="text-xs font-semibold text-stone-500">min</span>
           </div>
         </div>
 
         {/* Reflection Journal */}
-        <div style={{ marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#44403c' }}>
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-xs font-semibold text-stone-700">
               Personal Reflection Journal & Notes
             </label>
-            <span style={{ fontSize: '0.78rem', color: journal.length < 10 ? '#ef4444' : '#78716c' }}>
-              {journal.length} characters (min 10)
+            <span className={`text-[10px] ${journal.length < 10 ? 'text-rose-500 font-bold' : 'text-stone-400'}`}>
+              {journal.length} chars (min 10)
             </span>
           </div>
           <textarea
@@ -214,24 +219,14 @@ export const TrainingLogForm: React.FC<TrainingLogFormProps> = ({ enrollmentId, 
             onChange={(e) => setJournal(e.target.value)}
             placeholder="Describe techniques practiced, postures explored, anatomical observations, or questions for your faculty mentors..."
             required
-            style={{ width: '100%', padding: '0.65rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.9rem', boxSizing: 'border-box', fontFamily: 'inherit' }}
+            className="w-full p-2.5 bg-white border border-stone-300 rounded-lg text-xs text-stone-900 focus:ring-2 focus:ring-sky-500"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          style={{
-            backgroundColor: '#0c4a6e',
-            color: '#fff',
-            border: 'none',
-            padding: '0.65rem 1.25rem',
-            borderRadius: '6px',
-            fontSize: '0.92rem',
-            fontWeight: 600,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1,
-          }}
+          className="w-full py-2.5 bg-sky-800 hover:bg-sky-900 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer transition-colors disabled:opacity-50"
         >
           {loading ? 'Validating & Submitting...' : 'Submit Log Entry'}
         </button>

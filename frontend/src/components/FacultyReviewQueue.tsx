@@ -74,23 +74,23 @@ export const FacultyReviewQueue: React.FC = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', border: '1px solid #e7e5e4', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+    <div className="bg-white border border-stone-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#1c1917', fontWeight: 700 }}>
-            ⚖️ Faculty Review Queue
+          <h3 className="text-lg sm:text-xl font-bold text-stone-900 flex items-center gap-2">
+            <span>⚖️</span> Faculty Review Queue
           </h3>
-          <span style={{ fontSize: '0.85rem', color: '#78716c' }}>
-            Authoritative Review & Decision Engine · AI Grounded Briefs · Mandatory Feedback
-          </span>
+          <p className="text-xs text-stone-500 mt-0.5">
+            Authoritative Review & Decision Engine · AI Grounded Briefs · Mandatory Feedback on Rejection
+          </p>
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.85rem' }}
+            className="px-3 py-1.5 bg-stone-50 border border-stone-300 rounded-lg text-xs font-semibold text-stone-700 focus:ring-2 focus:ring-blue-500"
           >
             <option value="pending">Pending Queue</option>
             <option value="approved">Approved History</option>
@@ -101,7 +101,7 @@ export const FacultyReviewQueue: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.85rem' }}
+            className="px-3 py-1.5 bg-stone-50 border border-stone-300 rounded-lg text-xs font-semibold text-stone-700 focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Categories</option>
             <option value="asana_practice">Asana Practice</option>
@@ -113,70 +113,70 @@ export const FacultyReviewQueue: React.FC = () => {
       </div>
 
       {msg && (
-        <div style={{
-          backgroundColor: msg.type === 'success' ? '#f0fdf4' : '#fef2f2',
-          border: `1px solid ${msg.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
-          color: msg.type === 'success' ? '#166534' : '#991b1b',
-          padding: '0.75rem 1rem',
-          borderRadius: '6px',
-          marginBottom: '1rem',
-          fontSize: '0.88rem'
-        }}>
-          {msg.text}
+        <div
+          className={`p-4 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${
+            msg.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-rose-50 border-rose-200 text-rose-800'
+          }`}
+        >
+          <span>{msg.text}</span>
+          <button onClick={() => setMsg(null)} className="font-bold underline text-xs cursor-pointer ml-3">
+            Dismiss
+          </button>
         </div>
       )}
 
       {/* Review Dialog/Modal if open */}
       {selectedLogId && actionType && (
-        <div style={{ backgroundColor: '#f8fafc', border: '2px solid #0284c7', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-          <h4 style={{ margin: '0 0 0.5rem', color: '#0f172a', textTransform: 'capitalize' }}>
-            Confirm Review Decision: <span style={{ color: actionType === 'approve' ? '#16a34a' : actionType === 'reject' ? '#dc2626' : '#d97706' }}>{actionType.replace('_', ' ')}</span>
+        <div className="bg-sky-50/70 border-2 border-sky-600 rounded-xl p-4 sm:p-5 space-y-3">
+          <h4 className="font-bold text-stone-900 text-sm capitalize flex items-center gap-2">
+            <span>Decision:</span>
+            <span
+              className={`px-2.5 py-0.5 rounded text-xs font-bold uppercase ${
+                actionType === 'approve'
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : actionType === 'reject'
+                  ? 'bg-rose-100 text-rose-800'
+                  : 'bg-amber-100 text-amber-800'
+              }`}
+            >
+              {actionType.replace('_', ' ')}
+            </span>
           </h4>
 
-          <div style={{ marginBottom: '0.75rem' }}>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#475569', marginBottom: '0.3rem' }}>
-              {actionType === 'approve' ? 'Faculty Notes (Optional)' : 'Mandatory Justification / Feedback for Student *'}
+          <div className="space-y-1">
+            <label className="block text-xs font-semibold text-stone-700">
+              {actionType === 'approve' ? 'Faculty Constructive Feedback (Optional)' : 'Mandatory Justification / Actionable Guidance *'}
             </label>
             <textarea
               rows={3}
               value={feedbackReason}
               onChange={(e) => setFeedbackReason(e.target.value)}
-              placeholder={actionType === 'approve' ? 'Great alignment notes...' : 'Please specify why this log requires correction or was rejected...'}
+              placeholder={actionType === 'approve' ? 'Great alignment and steady breath awareness...' : 'Please specify why this log requires correction or was rejected...'}
               required={actionType !== 'approve'}
-              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem', boxSizing: 'border-box' }}
+              className="w-full p-2.5 bg-white border border-stone-300 rounded-lg text-xs text-stone-900 focus:ring-2 focus:ring-sky-500"
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className="flex gap-2">
             <button
               onClick={handleConfirmDecision}
               disabled={actionLoading}
-              style={{
-                backgroundColor: actionType === 'approve' ? '#16a34a' : actionType === 'reject' ? '#dc2626' : '#d97706',
-                color: '#fff',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontWeight: 600,
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-              }}
+              className={`px-4 py-2 text-white font-semibold rounded-lg text-xs shadow-xs cursor-pointer disabled:opacity-50 ${
+                actionType === 'approve'
+                  ? 'bg-emerald-700 hover:bg-emerald-800'
+                  : actionType === 'reject'
+                  ? 'bg-rose-700 hover:bg-rose-800'
+                  : 'bg-amber-700 hover:bg-amber-800'
+              }`}
             >
               {actionLoading ? 'Saving...' : `Confirm ${actionType.replace('_', ' ')}`}
             </button>
             <button
               onClick={handleCloseAction}
               disabled={actionLoading}
-              style={{
-                backgroundColor: '#f1f5f9',
-                color: '#475569',
-                border: '1px solid #cbd5e1',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontWeight: 600,
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-              }}
+              className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold rounded-lg text-xs cursor-pointer"
             >
               Cancel
             </button>
@@ -186,37 +186,54 @@ export const FacultyReviewQueue: React.FC = () => {
 
       {/* Queue List */}
       {loading ? (
-        <p style={{ color: '#78716c', textAlign: 'center', padding: '1rem' }}>Loading review queue...</p>
+        <p className="text-stone-500 text-center py-8 text-xs">Loading review queue...</p>
       ) : logs.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#a8a29e', backgroundColor: '#fafaf9', borderRadius: '6px' }}>
-          No logs currently waiting in the {statusFilter} queue.
+        <div className="text-center py-10 px-4 text-stone-400 bg-stone-50/50 rounded-xl border border-dashed border-stone-200 text-xs">
+          No training logs currently in the <strong className="text-stone-600">{statusFilter}</strong> queue.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="space-y-4">
           {logs.map((log) => (
-            <div key={log.id} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1.25rem', backgroundColor: '#fff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a' }}>{log.student_name}</span>
-                  <span style={{ margin: '0 0.5rem', color: '#cbd5e1' }}>·</span>
-                  <span style={{ fontWeight: 600, color: '#0369a1' }}>{log.category.replace('_', ' ')}</span>
-                  <span style={{ margin: '0 0.5rem', color: '#cbd5e1' }}>·</span>
-                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{log.duration_hours}h ({log.duration_minutes}m)</span>
+            <div
+              key={log.id}
+              className="border border-stone-200 rounded-xl p-4 sm:p-5 bg-white hover:border-stone-300 transition-colors space-y-3 shadow-2xs"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-2.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold text-stone-900 text-sm sm:text-base">{log.student_name}</span>
+                  <span className="text-stone-300">·</span>
+                  <span className="text-xs font-semibold text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                    {log.category.replace(/_/g, ' ')}
+                  </span>
+                  <span className="text-stone-300">·</span>
+                  <span className="text-xs font-bold text-stone-900">
+                    {log.duration_hours}h ({log.duration_minutes} min)
+                  </span>
                 </div>
 
-                <span style={{ backgroundColor: '#fef9c3', color: '#854d0e', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
-                  {log.status.replace('_', ' ')}
+                <span
+                  className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded border self-start sm:self-auto ${
+                    log.status === 'approved'
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                      : log.status === 'rejected'
+                      ? 'bg-rose-100 text-rose-800 border-rose-300'
+                      : 'bg-amber-100 text-amber-900 border-amber-300'
+                  }`}
+                >
+                  {log.status.replace(/_/g, ' ')}
                 </span>
               </div>
 
-              <div style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '0.65rem' }}>
-                Practice Date: <strong>{log.practice_date}</strong> · Submitted: {new Date(log.submitted_at).toLocaleString()}
+              <div className="text-[11px] text-stone-500">
+                Practice Date: <strong className="text-stone-700">{log.practice_date}</strong> · Submitted: {new Date(log.submitted_at).toLocaleString()}
               </div>
 
               {/* Reflection Journal */}
-              <div style={{ fontSize: '0.9rem', color: '#334155', backgroundColor: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '6px', borderLeft: '4px solid #0284c7', marginBottom: '0.5rem', lineHeight: 1.5 }}>
-                <span style={{ fontWeight: 600, color: '#475569', display: 'block', marginBottom: '0.25rem', fontSize: '0.78rem' }}>Original Student Reflection:</span>
-                {log.reflection_journal}
+              <div className="p-3.5 bg-stone-50/80 rounded-xl border-l-4 border-sky-600 text-xs text-stone-800 space-y-1">
+                <span className="font-bold text-stone-500 uppercase text-[10px] tracking-wider block">
+                  Original Student Reflection
+                </span>
+                <p className="leading-relaxed">{log.reflection_journal}</p>
               </div>
 
               {/* AI Practice Brief Component */}
@@ -224,29 +241,29 @@ export const FacultyReviewQueue: React.FC = () => {
 
               {/* Feedback reason if previously reviewed */}
               {log.review_feedback && (
-                <div style={{ backgroundColor: '#fffbeb', border: '1px solid #fef3c7', padding: '0.5rem 0.75rem', borderRadius: '4px', fontSize: '0.82rem', color: '#92400e', marginTop: '0.75rem' }}>
+                <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-lg text-xs text-amber-900">
                   <strong>Prior Feedback ({log.reviewed_by}):</strong> {log.review_feedback}
                 </div>
               )}
 
               {/* Decision Action Buttons (only shown if log is actionable) */}
               {(log.status === 'pending' || log.status === 'correction_requested') && (
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                <div className="flex flex-wrap gap-2 pt-1">
                   <button
                     onClick={() => handleOpenAction(log.id, 'approve')}
-                    style={{ backgroundColor: '#16a34a', color: '#fff', border: 'none', padding: '0.45rem 0.85rem', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}
+                    className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
                   >
                     ✓ Approve Hours
                   </button>
                   <button
                     onClick={() => handleOpenAction(log.id, 'reject')}
-                    style={{ backgroundColor: '#dc2626', color: '#fff', border: 'none', padding: '0.45rem 0.85rem', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}
+                    className="px-3.5 py-1.5 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
                   >
                     ✕ Reject
                   </button>
                   <button
                     onClick={() => handleOpenAction(log.id, 'request_correction')}
-                    style={{ backgroundColor: '#d97706', color: '#fff', border: 'none', padding: '0.45rem 0.85rem', borderRadius: '4px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}
+                    className="px-3.5 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
                   >
                     ↺ Request Correction
                   </button>
