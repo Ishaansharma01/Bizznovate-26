@@ -59,6 +59,34 @@ export interface Enrollment {
   created_at: string;
 }
 
+export interface TrainingLog {
+  id: string;
+  enrollment_id: string;
+  student_id: string;
+  student_name: string;
+  practice_date: string;
+  category: 'asana_practice' | 'anatomy' | 'yoga_philosophy' | 'practical_teaching';
+  duration_minutes: number;
+  duration_hours: number;
+  reflection_journal: string;
+  session_start_time?: string;
+  session_end_time?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'correction_requested';
+  submitted_at: string;
+  review_feedback?: string | null;
+  reviewed_by?: string | null;
+  reviewed_at?: string | null;
+}
+
+export interface DailyCapacity {
+  practice_date: string;
+  existing_minutes: number;
+  existing_hours: number;
+  daily_max_hours: number;
+  remaining_minutes: number;
+  remaining_hours: number;
+}
+
 export interface HealthData {
   status: string;
   database: string;
@@ -147,5 +175,47 @@ export async function createEnrollmentApi(data: {
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
+  return response.json();
+}
+
+// Training Log APIs
+export async function submitLogApi(data: {
+  enrollment_id: string;
+  practice_date: string;
+  category: string;
+  duration_minutes: number;
+  reflection_journal: string;
+}): Promise<ApiResponse<TrainingLog>> {
+  const response = await fetch(`${API_BASE}/logs`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}
+
+export async function getMyLogsApi(
+  statusFilter?: string,
+  categoryFilter?: string
+): Promise<ApiResponse<TrainingLog[]>> {
+  const params = new URLSearchParams();
+  if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
+  if (categoryFilter && categoryFilter !== 'all') params.append('category', categoryFilter);
+
+  const queryStr = params.toString() ? `?${params.toString()}` : '';
+  const response = await fetch(`${API_BASE}/logs/me${queryStr}`, {
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+}
+
+export async function getDailyCapacityApi(
+  enrollmentId: string,
+  practiceDate: string
+): Promise<ApiResponse<DailyCapacity>> {
+  const response = await fetch(
+    `${API_BASE}/logs/daily-capacity?enrollment_id=${enrollmentId}&practice_date=${practiceDate}`,
+    { headers: getAuthHeaders() }
+  );
   return response.json();
 }
