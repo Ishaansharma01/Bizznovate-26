@@ -3,6 +3,7 @@ from typing import Any, Optional
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.schemas.response import ApiResponse
 
@@ -56,7 +57,7 @@ async def app_exception_handler(request: Request, exc: ShailjaYogaException):
 
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    errors = exc.errors()
+    errors = jsonable_encoder(exc.errors())
     response = ApiResponse.fail(
         code="VALIDATION_ERROR",
         message="Request validation failed",
