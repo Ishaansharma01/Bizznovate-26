@@ -1,8 +1,8 @@
-# Shailja Yoga — Yoga Teacher Training Verification & Hours Logger
+# Shailja Yoga — Yoga Teacher Training Certification (TTC) Platform
 
-An integrated, enterprise-grade web platform for Shailja Yoga's certified **200-hour Yoga Teacher Training Certification (TTC)** program.
+An enterprise-grade, authoritative web platform for Shailja Yoga's certified **200-hour Yoga Teacher Training Certification (TTC)** program.
 
-The platform provides an authoritative, tamper-evident system for tracking student practice hours, faculty verification, pace monitoring, AI-assisted journal briefs, and dynamic certificate issuance with public cryptographic verification.
+The platform provides a complete, tamper-evident system for tracking student practice hours, faculty verification, pace monitoring, AI-assisted journal briefs, and dynamic certificate issuance with public cryptographic verification.
 
 ---
 
@@ -12,13 +12,13 @@ The platform provides an authoritative, tamper-evident system for tracking stude
 - **Frontend:** React 18, TypeScript, Vite.
 - **Database:** PostgreSQL in staging/production; automatic SQLite fallback for standalone local development.
 - **Migrations:** Alembic database version control.
-- **Security:** JWT authentication with role-based access control (Student, Faculty, Admin, Certificate Issuer).
-- **PDF & Cryptography:** ReportLab dynamic PDF generation with SHA-256 integrity digests and QR verification codes.
-- **NLP Summaries:** Grounded practice reflection briefs behind a replaceable provider interface.
+- **Security:** JWT authentication with role-based access control (Student, Faculty, Admin, Certificate Issuer), Argon2id password hashing, and anti-scraping sliding-window rate limiting on public endpoints.
+- **PDF & Cryptography:** ReportLab dynamic PDF generation with HMAC-SHA256 integrity digests, decorative certificate borders, and QR verification codes.
+- **NLP Summaries:** Grounded practice reflection briefs behind a replaceable provider interface (`MockSummarizer`, `ExternalSummarizer`), with automatic fallback on provider downtime.
 
 ---
 
-## 2. Canonical Business Rules
+## 2. Canonical Business Rules & Invariants
 
 1. **200 Faculty-Approved Hours:** Certification requires at least 200 faculty-approved hours. Pending and rejected hours **never** count.
 2. **8-Hour Daily Limit:** Maximum 8 hours per student per program calendar day across all 4 categories combined.
@@ -29,8 +29,8 @@ The platform provides an authoritative, tamper-evident system for tracking stude
    - `yoga_philosophy`: Yoga Philosophy & Ethics
    - `practical_teaching`: Practical Teaching & Methodology
 5. **Authoritative Server:** The server alone computes eligibility, daily caps, and progress.
-6. **AI Decision Support:** AI reflections assist faculty but never approve hours or determine eligibility.
-7. **Privacy in Public Verifier:** The public verification page never leaks personal journals, internal notes, or raw student logs.
+6. **AI Decision Support:** AI reflections assist faculty but **never** approve hours or determine eligibility.
+7. **Privacy in Public Verifier:** The public verification page adheres strictly to Data Minimization: it never leaks personal journals, student emails, phone numbers, or server filesystem paths.
 
 ---
 
@@ -45,7 +45,7 @@ The platform provides an authoritative, tamper-evident system for tracking stude
 │   ├── ARCHITECTURE.md       # Component boundaries and data flow
 │   ├── API_CONTRACT.md       # Endpoint specs, standard JSON envelopes & status codes
 │   ├── DATA_MODEL.md         # Database entities, relationships & canonical enums
-│   └── INTEGRATION_STATUS.md # Phase execution status and test results
+│   └── INTEGRATION_STATUS.md # Phase execution status and acceptance report
 ├── backend/                  # FastAPI backend
 │   ├── alembic.ini           # Alembic database migration config
 │   ├── alembic/              # Database migration versions
@@ -56,9 +56,10 @@ The platform provides an authoritative, tamper-evident system for tracking stude
 │   │   ├── database.py       # SQLAlchemy engine & session management
 │   │   ├── models/           # Canonical models & enums
 │   │   ├── schemas/          # Standard response envelopes & DTOs
-│   │   ├── core/             # Centralized exceptions & error handling
-│   │   └── api/v1/           # API v1 endpoints (Health, Auth, Logs, etc.)
-│   └── tests/                # Automated pytest suite
+│   │   ├── core/             # Centralized exceptions, rate limiting & error handling
+│   │   ├── services/         # Progress, Logs, Certificates, NLP & Notifications
+│   │   └── api/v1/           # API v1 endpoints (Health, Auth, Logs, Faculty, Certs, Public)
+│   └── tests/                # Automated pytest suite (69 tests)
 └── frontend/                 # React + TypeScript frontend
     ├── package.json          # Node dependencies and scripts
     ├── tsconfig.json         # TypeScript compiler configuration
@@ -67,6 +68,7 @@ The platform provides an authoritative, tamper-evident system for tracking stude
     └── src/
         ├── App.tsx           # Foundation dashboard & status indicator
         ├── main.tsx          # React application root
+        ├── components/       # Log forms, review queue, pace alerts & public verifier
         └── services/         # API integration client
 ```
 
@@ -96,7 +98,7 @@ The platform provides an authoritative, tamper-evident system for tracking stude
    python -m alembic -c backend/alembic.ini upgrade head
    ```
 
-5. **Run Automated Tests:**
+5. **Run Automated Tests (69 tests):**
    ```bash
    python -m pytest backend/tests -v
    ```
@@ -105,7 +107,7 @@ The platform provides an authoritative, tamper-evident system for tracking stude
    ```bash
    python -m uvicorn app.main:app --app-dir backend --reload --port 8000
    ```
-   Interactive API docs are available at `http://127.0.0.1:8000/docs`.
+   Interactive API documentation (Swagger UI): `http://127.0.0.1:8000/docs`
 
 ### 4.2 Frontend Setup
 
@@ -128,14 +130,16 @@ The platform provides an authoritative, tamper-evident system for tracking stude
 
 ---
 
-## 5. Development Phases Roadmap
+## 5. Development Phases Roadmap & Verification
 
-- [x] **Phase 0:** Repository Audit, Shared Foundation and Contracts (Completed)
-- [ ] **Phase 1:** Authentication, Roles, Program Configuration and Enrollment
-- [ ] **Phase 2:** Core Hour Logging and Verification Engine
-- [ ] **Phase 3:** Faculty Review, Audit Trail and Verified Progress
-- [ ] **Phase 4:** Progress Pace Monitor and Notifications
-- [ ] **Phase 5:** Practice Summary Generator (NLP)
-- [ ] **Phase 6:** Certificate Eligibility, Dynamic PDF Issuance and Lifecycle
-- [ ] **Phase 7:** Public Alumni Certificate Verification
-- [ ] **Phase 8:** Full Integration, Security and QA
+- [x] **Phase 0:** Repository Audit, Shared Foundation and Contracts (6 tests)
+- [x] **Phase 1:** Authentication, Roles, Program Configuration and Enrollment (9 tests)
+- [x] **Phase 2:** Core Hour Logging and Verification Engine (8 tests)
+- [x] **Phase 3:** Faculty Review, Audit Trail and Verified Progress (6 tests)
+- [x] **Phase 4:** Progress Pace Monitor and Notifications (6 tests)
+- [x] **Phase 5:** Practice Summary Generator (NLP) (4 tests)
+- [x] **Phase 6:** Certificate Eligibility, Dynamic PDF Issuance and Lifecycle (12 tests)
+- [x] **Phase 7:** Public Alumni Certificate Verification (9 tests)
+- [x] **Phase 8:** Full Integration, Security Review, End-to-End QA & Release (9 acceptance tests)
+
+**Total Test Coverage:** 69 passing backend tests across all functional modules.
