@@ -12,3 +12,17 @@ body {
   background-color: #fafaf9;
   color: #1c1917;
 }
+
+/* Bulletproof safety: ensure SVG icons never blow up under any viewport or styling anomaly */
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+svg.w-3, svg[class*="w-3"] { width: 0.75rem !important; height: 0.75rem !important; }
+svg.w-4, svg[class*="w-4"] { width: 1rem !important; height: 1rem !important; }
+svg.w-5, svg[class*="w-5"] { width: 1.25rem !important; height: 1.25rem !important; }
+svg.w-6, svg[class*="w-6"] { width: 1.5rem !important; height: 1.5rem !important; }
+svg.w-8, svg[class*="w-8"] { width: 2rem !important; height: 2rem !important; }
+svg.w-12, svg[class*="w-12"] { width: 3rem !important; height: 3rem !important; }

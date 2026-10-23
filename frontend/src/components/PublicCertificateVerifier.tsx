@@ -138,6 +138,19 @@ export const PublicCertificateVerifier: React.FC<Props> = ({ initialCertificateI
               {loading ? 'Verifying...' : 'Verify Credential'}
             </button>
           </div>
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-stone-500">
+            <span>Quick test with verified sample credential:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setCertIdInput('SY-TTC200-2026-1BB17503');
+                handleVerify('SY-TTC200-2026-1BB17503');
+              }}
+              className="text-amber-800 hover:text-amber-950 font-mono font-semibold underline cursor-pointer bg-amber-100/70 px-2.5 py-1 rounded border border-amber-300"
+            >
+              SY-TTC200-2026-1BB17503 (Click to verify)
+            </button>
+          </div>
           <p className="text-[11px] text-stone-400">
             Format: Standard non-sequential identifier issued by the academy (e.g. SY-TTC200-YYYY-XXXX).
           </p>

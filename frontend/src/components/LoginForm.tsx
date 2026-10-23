@@ -22,7 +22,7 @@ export const LoginForm: React.FC = () => {
   return (
     <div style={{ maxWidth: '440px', margin: '2rem auto', backgroundColor: '#fff', padding: '2rem', borderRadius: '12px', border: '1px solid #e7e5e4', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
       <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-        <span style={{ fontSize: '2.5rem' }}>🔐</span>
+        <span style={{ fontSize: '2.5rem' }}>🧘</span>
         <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0.5rem 0 0.25rem', color: '#1c1917' }}>Sign In to Portal</h2>
         <p style={{ color: '#78716c', fontSize: '0.88rem', margin: 0 }}>Role-Based Access Control for Students, Faculty & Admins</p>
       </div>
@@ -56,7 +56,7 @@ export const LoginForm: React.FC = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
+            placeholder="Enter password (default: password123)"
             required
             style={{ width: '100%', padding: '0.65rem 0.75rem', borderRadius: '6px', border: '1px solid #d6d3d1', fontSize: '0.92rem', boxSizing: 'border-box' }}
           />
@@ -86,36 +86,43 @@ export const LoginForm: React.FC = () => {
       {/* Quick Testing Provisioned Accounts */}
       <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px dashed #e7e5e4' }}>
         <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#78716c', textTransform: 'uppercase', marginBottom: '0.6rem', textAlign: 'center' }}>
-          One-Click Test Accounts (Local Dev)
+          One-Click Demo Accounts
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
           <button
             type="button"
-            onClick={() => handleQuickLogin('student1@shailjayoga.com', 'StudentPass123!')}
+            onClick={() => handleQuickLogin('student1@shailjayoga.com', 'password123')}
             style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
           >
-            👤 Student 1 (Enrolled)
+            👤 Student 1 (Ananya)
           </button>
           <button
             type="button"
-            onClick={() => handleQuickLogin('student2@shailjayoga.com', 'StudentPass123!')}
+            onClick={() => handleQuickLogin('student2@shailjayoga.com', 'password123')}
             style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
           >
-            👤 Student 2 (Unenrolled)
+            👤 Student 2 (Dev)
           </button>
           <button
             type="button"
-            onClick={() => handleQuickLogin('faculty@shailjayoga.com', 'FacultyPass123!')}
+            onClick={() => handleQuickLogin('faculty@shailjayoga.com', 'password123')}
             style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
           >
             🎓 Faculty Reviewer
           </button>
           <button
             type="button"
-            onClick={() => handleQuickLogin('admin@shailjayoga.com', 'AdminPass123!')}
+            onClick={() => handleQuickLogin('issuer@shailjayoga.com', 'password123')}
             style={{ fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
           >
-            ⚙️ Administrator
+            📜 Certificate Issuer
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('admin@shailjayoga.com', 'password123')}
+            style={{ gridColumn: 'span 2', fontSize: '0.75rem', padding: '0.45rem', border: '1px solid #cbd5e1', borderRadius: '4px', backgroundColor: '#f8fafc', cursor: 'pointer', textAlign: 'center' }}
+          >
+            ⚙️ Master Administrator
           </button>
         </div>
       </div>
